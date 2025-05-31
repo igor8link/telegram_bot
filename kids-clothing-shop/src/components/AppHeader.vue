@@ -181,7 +181,7 @@ onUnmounted(() => {
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #ffffff;
+  background-color: #2160d5b2;
   z-index: 1000;
   transition: box-shadow 0.3s ease;
 }

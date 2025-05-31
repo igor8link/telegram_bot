@@ -130,21 +130,16 @@ const loading = ref(true);
 const boysCarouselSlides = ref([
   {
     id: 1,
-    image: '/images/white_t_shirt_0.webp',
+    image: new URL('@/assets/images/white_t_shirt_0.webp', import.meta.url).href,
     alt: 'Новая коллекция для мальчиков',
     title: 'НОВАЯ КОЛЛЕКЦИЯ',
     subtitle: 'Стильная одежда для мальчиков',
-    buttonText: 'СМОТРЕТЬ',
-    buttonLink: '/categories/boys/new'
   },
   {
     id: 2,
     image: '/images/placeholder-carousel.jpg',
     alt: 'Спортивная одежда',
     title: 'СПОРТ И АКТИВНОСТЬ',
-    subtitle: 'Комфортная спортивная одежда',
-    buttonText: 'В КАТАЛОГ',
-    buttonLink: '/categories/boys/sportswear'
   },
   {
     id: 3,
@@ -152,8 +147,6 @@ const boysCarouselSlides = ref([
     alt: 'Школьная форма',
     title: 'К ШКОЛЕ ГОТОВ',
     subtitle: 'Школьная и деловая одежда',
-    buttonText: 'ВЫБРАТЬ',
-    buttonLink: '/categories/boys/formal'
   }
 ]);
 

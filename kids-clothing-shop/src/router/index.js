@@ -107,12 +107,6 @@ const routes = [
   //   meta: { title: 'Товар' }
   // },
   // {
-  //   path: '/favorites',
-  //   name: 'favorites',
-  //   component: () => import('@/views/FavoritesView.vue'),
-  //   meta: { title: 'Избранное' }
-  // },
-  // {
   //   path: '/cart',
   //   name: 'cart',
   //   component: () => import('@/views/CartView.vue'),

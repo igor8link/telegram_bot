@@ -21,10 +21,9 @@ from .custom_serializers import CustomUserSerializer
 class CustomerProfileViewSet(viewsets.ModelViewSet):
     serializer_class = CustomerProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
-    pagination_class = None  # Disable pagination for profiles
+    pagination_class = None  
     
     def get_queryset(self):
-        # Get or create profile for the current user
         profile, created = CustomerProfile.objects.get_or_create(
             user=self.request.user,
             defaults={
@@ -35,7 +34,7 @@ class CustomerProfileViewSet(viewsets.ModelViewSet):
         return CustomerProfile.objects.filter(user=self.request.user).order_by('id')
     
     def get_object(self):
-        # Get or create profile for the current user
+        # Получить или создать  
         profile, created = CustomerProfile.objects.get_or_create(
             user=self.request.user,
             defaults={
@@ -47,10 +46,8 @@ class CustomerProfileViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def me(self, request):
-        """Get current user's profile with enhanced data"""
         profile = self.get_object()
         
-        # Return enhanced profile data
         profile_data = {
             'id': profile.id,
             'user': {
@@ -62,7 +59,6 @@ class CustomerProfileViewSet(viewsets.ModelViewSet):
             },
             'phone_number': profile.phone_number,
             'address': profile.address,
-            # Also include flat structure for easier access
             'username': request.user.username,
             'email': request.user.email,
             'first_name': request.user.first_name,
@@ -73,10 +69,8 @@ class CustomerProfileViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['put', 'patch'])
     def update_me(self, request):
-        """Update current user's profile"""
         profile = self.get_object()
-        
-        # Update user fields if provided
+
         user = request.user
         if 'first_name' in request.data:
             user.first_name = request.data['first_name']
@@ -84,12 +78,11 @@ class CustomerProfileViewSet(viewsets.ModelViewSet):
             user.last_name = request.data.get('last_name', '')
         user.save()
         
-        # Update profile fields
         serializer = self.get_serializer(profile, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         
-        # Return the same enhanced format as the me endpoint
+        # сериализация данных
         profile_data = {
             'id': profile.id,
             'user': {

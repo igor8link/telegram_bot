@@ -13,13 +13,6 @@
         <div class="carousel-content" v-if="slide.title || slide.subtitle || slide.buttonText">
           <h2 v-if="slide.title" class="carousel-title">{{ slide.title }}</h2>
           <p v-if="slide.subtitle" class="carousel-subtitle">{{ slide.subtitle }}</p>
-          <router-link 
-            v-if="slide.buttonText && slide.buttonLink" 
-            :to="slide.buttonLink" 
-            class="carousel-button"
-          >
-            {{ slide.buttonText }}
-          </router-link>
         </div>
       </div>
     </div>
