@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '@/stores/authStore';
 import HomeView from '@/views/HomeView.vue';
+import CartView from '@/views/CartView.vue';
 
 const routes = [
   {
@@ -27,13 +28,18 @@ const routes = [
     component: () => import('@/views/GirlsView.vue'),
     meta: { title: 'Одежда для девочек' }
   },
+    {
+    path: '/cart',
+    name: 'Cart',
+    component: CartView,
+  },
   // {
   //   path: '/categories/boys/:subcategory',
   //   name: 'boys-subcategory',
   //   component: () => import('@/views/CatalogueView.vue'),
-  //   props: route => ({ 
-  //     gender: 'boys', 
-  //     category: route.params.subcategory 
+  //   props: route => ({
+  //     gender: 'boys',
+  //     category: route.params.subcategory
   //   }),
   //   meta: { title: 'Категория для мальчиков' }
   // },
@@ -41,9 +47,9 @@ const routes = [
   //   path: '/categories/girls/:subcategory',
   //   name: 'girls-subcategory',
   //   component: () => import('@/views/CatalogueView.vue'),
-  //   props: route => ({ 
-  //     gender: 'girls', 
-  //     category: route.params.subcategory 
+  //   props: route => ({
+  //     gender: 'girls',
+  //     category: route.params.subcategory
   //   }),
   //   meta: { title: 'Категория для девочек' }
   // },
@@ -183,7 +189,7 @@ const router = createRouter({
 // router.beforeEach((to, from, next) => {
 //   // Update page title
 //   document.title = to.meta.title ? `${to.meta.title} | Kids Clothing Shop` : 'Kids Clothing Shop';
-  
+
 //   // Check for protected routes
 //   if (to.matched.some(record => record.meta.requiresAuth)) {
 //     // Check if user is logged in
@@ -204,11 +210,11 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   // Update page title
   document.title = to.meta.title ? `${to.meta.title} | Kids Clothing Shop` : 'Kids Clothing Shop';
-  
+
   // Check for protected routes
   if (to.matched.some(record => record.meta.requiresAuth)) {
     const authStore = useAuthStore();
-    
+
     if (!authStore.isAuthenticated) {
       // Redirect to home page if not authenticated
       // The user icon will open the login modal

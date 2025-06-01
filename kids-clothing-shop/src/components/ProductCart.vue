@@ -4,80 +4,81 @@
       <router-link :to="`/products/${product.slug}`" class="product-link">
         <!-- Product Image -->
         <div class="product-image-wrapper">
-          <img 
-            :src="mainImage" 
-            :alt="product.title" 
+          <img
+            :src="mainImage"
+            :alt="product.title"
             class="product-image"
           >
         </div>
-        
+
         <!-- Product Badges -->
         <div class="product-badges">
           <span v-if="product.is_new" class="badge badge-new">NEW</span>
           <span v-if="salePercentage" class="badge badge-sale">-{{ salePercentage }}%</span>
         </div>
       </router-link>
-      
+
       <!-- Favorite Button -->
-      <button 
+      <button
         class="favorite-button"
         :class="{ 'active': isFavorite }"
         @click.stop.prevent="toggleFavorite"
         :disabled="isToggling"
         type="button"
       >
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          width="20" 
-          height="20" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="currentColor" 
-          stroke-width="2" 
-          stroke-linecap="round" 
-          stroke-linejoin="round" 
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
           class="heart-icon"
         >
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"></path>
         </svg>
       </button>
-      
+
       <!-- Cart Button -->
-      <button 
-        class="cart-button"
-        @click.stop.prevent="addToCart"
-        type="button"
-        title="Добавить в корзину"
-      >
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          width="20" 
-          height="20" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="currentColor" 
-          stroke-width="2" 
-          stroke-linecap="round" 
-          stroke-linejoin="round"
-        >
-          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-          <line x1="3" y1="6" x2="21" y2="6"></line>
-          <path d="M16 10a4 4 0 0 1-8 0"></path>
-        </svg>
-      </button>
+  <!-- Cart Button -->
+  <button
+    class="cart-button"
+    @click.stop.prevent="addToCart"
+    type="button"
+    title="Добавить в корзину"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <path d="M16 10a4 4 0 0 1-8 0"></path>
+    </svg>
+  </button>
     </div>
-    
+
     <!-- Product Info -->
     <div class="product-info">
       <router-link :to="`/products/${product.slug}`" class="product-title">
         {{ product.title }}
       </router-link>
-      
+
       <div class="product-price">
         <span v-if="product.sale_price" class="sale-price">
           {{ formatPrice(product.sale_price) }}
         </span>
-        <span 
+        <span
           class="regular-price"
           :class="{ 'strike': product.sale_price }"
         >
@@ -92,6 +93,7 @@
 import { computed, ref, watch, nextTick } from 'vue';
 import { useFavoriteStore } from '@/stores/favoriteStore';
 import { useAuthStore } from '@/stores/authStore';
+import { useCartStore } from '@/stores/cart';
 
 const props = defineProps({
   product: {
@@ -102,29 +104,25 @@ const props = defineProps({
 
 const favoriteStore = useFavoriteStore();
 const authStore = useAuthStore();
+const cartStore = useCartStore();
+
 const isToggling = ref(false);
 
-// Create a reactive computed that properly tracks the store state
+// Проверка: в избранном ли товар
 const isFavorite = computed(() => {
-  // This forces reactivity by directly checking the store's reactive array
   return favoriteStore.favoriteItems.some(item => item.id === props.product.id);
 });
 
-// Debug watcher to see when favorite status changes
 watch(isFavorite, (newVal, oldVal) => {
   console.log(`Product ${props.product.id} favorite status: ${oldVal} -> ${newVal}`);
 }, { immediate: true });
 
-// Watch for changes in the favorites array
 watch(() => favoriteStore.favoriteItems, (newItems) => {
   console.log('Favorites array updated:', newItems.length, 'items');
 }, { deep: true });
 
 const mainImage = computed(() => {
-  if (props.product.main_image_url) {
-    return props.product.main_image_url;
-  }
-  return '/images/placeholder.jpg';
+  return props.product.main_image_url || '/images/placeholder.jpg';
 });
 
 const salePercentage = computed(() => {
@@ -138,29 +136,25 @@ const salePercentage = computed(() => {
 
 const toggleFavorite = async () => {
   if (isToggling.value) return;
-  
+
   console.log('=== TOGGLE FAVORITE START ===');
   console.log('Product:', props.product.title, 'ID:', props.product.id);
   console.log('Current status:', isFavorite.value);
   console.log('User authenticated:', authStore.isAuthenticated);
-  
+
   isToggling.value = true;
-  
+
   try {
     await favoriteStore.toggleFavorite(props.product);
-    
-    // Wait for reactivity to update
     await nextTick();
-    
     console.log('Toggle completed. New status:', isFavorite.value);
     console.log('Current favorites count:', favoriteStore.favoriteItems.length);
-    
   } catch (error) {
     console.error('Toggle favorite error:', error);
   } finally {
     isToggling.value = false;
   }
-  
+
   console.log('=== TOGGLE FAVORITE END ===');
 };
 
@@ -169,15 +163,18 @@ const addToCart = () => {
     product: props.product.title,
     id: props.product.id
   });
-  
-  // Add your cart logic here
-  // Example: cartStore.addToCart(props.product);
+
+  cartStore.addToCart(props.product);
+
+  // Проверка содержимого корзины:
+  console.log('Current cart items:', cartStore.items);
 };
 
 const formatPrice = (price) => {
   return `${price} ₽`;
 };
 </script>
+
 
 <style scoped>
 .product-card {
@@ -371,21 +368,21 @@ const formatPrice = (price) => {
   .product-card {
     border-radius: 6px;
   }
-  
+
   .product-info {
     padding: 10px;
   }
-  
+
   .product-title {
     font-size: 1rem;
   }
-  
+
   .favorite-button,
   .cart-button {
     width: 32px;
     height: 32px;
   }
-  
+
   .cart-button {
     right: 48px;
   }
