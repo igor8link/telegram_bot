@@ -74,18 +74,12 @@ const routes = [
   //   component: () => import('@/views/NewProductsView.vue'),
   //   meta: { title: 'Новинки' }
   // },
-  // {
-  //   path: '/products/:slug',
-  //   name: 'product-detail',
-  //   component: () => import('@/views/ProductDetailView.vue'),
-  //   meta: { title: 'Товар' }
-  // },
-  // {
-  //   path: '/cart',
-  //   name: 'cart',
-  //   component: () => import('@/views/CartView.vue'),
-  //   meta: { title: 'Корзина' }
-  // },
+  {
+    path: '/products/:slug',
+    name: 'product-detail',
+    component: () => import('@/views/ProductDetailView.vue'),
+    meta: { title: 'Товар' }
+  },
   // {
   //   path: '/checkout',
   //   name: 'checkout',
