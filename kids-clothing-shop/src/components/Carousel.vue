@@ -9,32 +9,23 @@
         :key="slide.id" 
         class="carousel-slide"
       >
-        <img :src="slide.image" :alt="slide.alt" class="carousel-image">
+        <div 
+          class="carousel-image" 
+          :style="{ backgroundImage: `url(${slide.image})` }" 
+          :aria-label="slide.alt" 
+          role="img"
+        ></div>
         <div class="carousel-content" v-if="slide.title || slide.subtitle || slide.buttonText">
           <h2 v-if="slide.title" class="carousel-title">{{ slide.title }}</h2>
           <p v-if="slide.subtitle" class="carousel-subtitle">{{ slide.subtitle }}</p>
-          <router-link 
-            v-if="slide.buttonText && slide.buttonLink" 
-            :to="slide.buttonLink" 
-            class="carousel-button"
-          >
-            {{ slide.buttonText }}
-          </router-link>
         </div>
       </div>
     </div>
     
+    <div class="carousel-click-zone left" @click="prevSlide" aria-label="Previous slide"></div>
+    <div class="carousel-click-zone right" @click="nextSlide" aria-label="Next slide"></div>
+
     <div class="carousel-controls" v-if="slides.length > 1">
-      <button 
-        class="carousel-arrow prev"
-        aria-label="Previous slide"
-        @click="prevSlide"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="15 18 9 12 15 6"></polyline>
-        </svg>
-      </button>
-      
       <div class="carousel-dots">
         <button 
           v-for="(slide, index) in slides" 
@@ -45,16 +36,6 @@
           :aria-label="`Go to slide ${index + 1}`"
         ></button>
       </div>
-      
-      <button 
-        class="carousel-arrow next"
-        aria-label="Next slide"
-        @click="nextSlide"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
-      </button>
     </div>
   </div>
 </template>
@@ -179,8 +160,28 @@ watch(() => props.slides, () => {
 
 .carousel-image {
   width: 100%;
-  height: auto;
-  display: block;
+  height: 100vh; 
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.carousel-click-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 20%;
+  z-index: 2;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0); /* Прозрачная зона */
+}
+
+.carousel-click-zone.left {
+  left: 0;
+}
+
+.carousel-click-zone.right {
+  right: 0;
 }
 
 .carousel-content {
@@ -230,24 +231,6 @@ watch(() => props.slides, () => {
   gap: 10px;
 }
 
-.carousel-arrow {
-  background: rgba(0, 0, 0, 0.5);
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.carousel-arrow:hover {
-  background: rgba(0, 0, 0, 0.8);
-}
-
 .carousel-dots {
   display: flex;
   gap: 8px;
@@ -276,6 +259,16 @@ watch(() => props.slides, () => {
   
   .carousel-subtitle {
     font-size: 1.5rem;
+  }
+
+  .carousel-image {
+    height: 600px;
+  }
+}
+
+@media (max-width: 767px) {
+  .carousel-image {
+    height: 70vh;
   }
 }
 </style>
