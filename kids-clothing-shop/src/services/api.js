@@ -155,6 +155,10 @@ export default {
     return apiClient.delete(`/cart-items/${id}/`);
   },
   
+  mergeCart() {
+  return apiClient.post('/carts/merge/');
+  },
+  
   // Orders
   getOrders() {
     return apiClient.get('/orders/');

@@ -27,44 +27,18 @@ const routes = [
     component: () => import('@/views/GirlsView.vue'),
     meta: { title: 'Одежда для девочек' }
   },
-  // {
-  //   path: '/categories/boys/:subcategory',
-  //   name: 'boys-subcategory',
-  //   component: () => import('@/views/CatalogueView.vue'),
-  //   props: route => ({ 
-  //     gender: 'boys', 
-  //     category: route.params.subcategory 
-  //   }),
-  //   meta: { title: 'Категория для мальчиков' }
-  // },
-  // {
-  //   path: '/categories/girls/:subcategory',
-  //   name: 'girls-subcategory',
-  //   component: () => import('@/views/CatalogueView.vue'),
-  //   props: route => ({ 
-  //     gender: 'girls', 
-  //     category: route.params.subcategory 
-  //   }),
-  //   meta: { title: 'Категория для девочек' }
-  // },
-  // {
-  //   path: '/products/:slug',
-  //   name: 'product-detail',
-  //   component: () => import('@/views/ProductDetailView.vue'),
-  //   meta: { title: 'Товар' }
-  // },
   {
     path: '/favorites',
     name: 'favorites',
     component: () => import('@/views/FavoritesView.vue'),
     meta: { title: 'Избранное' }
   },
-  // {
-  //   path: '/cart',
-  //   name: 'cart',
-  //   component: () => import('@/views/CartView.vue'),
-  //   meta: { title: 'Корзина' }
-  // },
+  {
+    path: '/cart',
+    name: 'cart',
+    component: () => import('@/views/CartView.vue'),
+    meta: { title: 'Корзина' }
+  },
   // {
   //   path: '/search',
   //   name: 'search',
@@ -129,25 +103,6 @@ const routes = [
   //   }
   // },
   // {
-  //   path: '/account',
-  //   name: 'account',
-  //   component: () => import('@/views/AccountView.vue'),
-  //   meta: { title: 'Личный кабинет', requiresAuth: true },
-  //   children: [
-  //     {
-  //       path: 'profile',
-  //       name: 'account-profile',
-  //       component: () => import('@/views/account/ProfileView.vue'),
-  //       meta: { title: 'Профиль', requiresAuth: true }
-  //     },
-  //     {
-  //       path: 'orders',
-  //       name: 'account-orders',
-  //       component: () => import('@/views/account/OrdersView.vue'),
-  //       meta: { title: 'Мои заказы', requiresAuth: true }
-  //     }
-  //   ]
-  // },
   // {
   //   path: '/search',
   //   name: 'search',
