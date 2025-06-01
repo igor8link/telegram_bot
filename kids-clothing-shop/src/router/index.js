@@ -30,22 +30,22 @@ const routes = [
   // {
   //   path: '/categories/boys/:subcategory',
   //   name: 'boys-subcategory',
-  //   component: () => import('@/views/CategoryDetailView.vue'),
-  //   meta: { title: 'Категория для мальчиков' },
+  //   component: () => import('@/views/CatalogueView.vue'),
   //   props: route => ({ 
   //     gender: 'boys', 
-  //     subcategory: route.params.subcategory 
-  //   })
+  //     category: route.params.subcategory 
+  //   }),
+  //   meta: { title: 'Категория для мальчиков' }
   // },
   // {
   //   path: '/categories/girls/:subcategory',
   //   name: 'girls-subcategory',
-  //   component: () => import('@/views/CategoryDetailView.vue'),
-  //   meta: { title: 'Категория для девочек' },
+  //   component: () => import('@/views/CatalogueView.vue'),
   //   props: route => ({ 
   //     gender: 'girls', 
-  //     subcategory: route.params.subcategory 
-  //   })
+  //     category: route.params.subcategory 
+  //   }),
+  //   meta: { title: 'Категория для девочек' }
   // },
   // {
   //   path: '/products/:slug',

@@ -195,7 +195,7 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  height: 60px;
+  height: 86px;
 }
 
 .logo {
