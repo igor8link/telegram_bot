@@ -130,20 +130,20 @@ const loading = ref(true);
 const boysCarouselSlides = ref([
   {
     id: 1,
-    image: new URL('@/assets/images/banner_1.png', import.meta.url).href,
+    image: new URL('@/assets/images/banner_01.png', import.meta.url).href,
     alt: 'Новая коллекция для мальчиков',
     title: 'НОВАЯ КОЛЛЕКЦИЯ',
     subtitle: 'Стильная одежда для мальчиков',
   },
   {
     id: 2,
-    image: new URL('@/assets/images/banner_1.png', import.meta.url).href,
+    image: new URL('@/assets/images/banner_01.png', import.meta.url).href,
     alt: 'Спортивная одежда',
     title: 'СПОРТ И АКТИВНОСТЬ',
   },
   {
     id: 3,
-    image: new URL('@/assets/images/banner_1.png', import.meta.url).href,
+    image: new URL('@/assets/images/banner_01.png', import.meta.url).href,
     alt: 'Школьная форма',
     title: 'К ШКОЛЕ ГОТОВ',
     subtitle: 'Школьная и деловая одежда',

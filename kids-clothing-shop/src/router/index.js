@@ -80,29 +80,12 @@ const routes = [
       }
     }
   },
-  // {
-  //   path: '/checkout',
-  //   name: 'checkout',
-  //   component: () => import('@/views/CheckoutView.vue'),
-  //   meta: { title: 'Оформление заказа' },
-  //   // Add basic route guard
-  //   beforeEnter: (to, from, next) => {
-  //     // Check if cart has items
-  //     const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
-  //     if (cartItems.length === 0) {
-  //       next({ name: 'cart' });
-  //     } else {
-  //       next();
-  //     }
-  //   }
-  // },
-  // {
-  // {
-  //   path: '/search',
-  //   name: 'search',
-  //   component: () => import('@/views/SearchView.vue'),
-  //   meta: { title: 'Поиск' }
-  // },
+  {
+    path: '/search',
+    name: 'search',
+    component: () => import('@/views/SearchView.vue'),
+    meta: { title: 'Поиск' }
+  },
   // // Error pages
   // {
   //   path: '/404',

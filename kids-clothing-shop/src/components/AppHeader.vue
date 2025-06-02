@@ -181,7 +181,7 @@ onUnmounted(() => {
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #2160d5b2;
+  background-color: #2160d5e9;
   z-index: 1000;
   transition: box-shadow 0.3s ease;
 }
@@ -195,7 +195,7 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  height: 86px;
+  height: 60px;
 }
 
 .logo {
