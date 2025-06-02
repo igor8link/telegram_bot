@@ -33,7 +33,6 @@
       <div class="selector">
         <label>Размер:</label>
         <select v-model.number="selectedSizeId">
-          <!-- ИСПРАВЛЕНО: вместо :value="size.id" (это stock.id) — даём ID размера: size.size.id -->
           <option 
             v-for="size in availableSizes" 
             :key="size.id" 
@@ -46,7 +45,17 @@
 
       <button class="add-to-cart" @click="addToCart">Добавить в корзину</button>
 
-      <!-- … вкладки “О товаре”/“Доставка” … -->
+       <div class="tabs">
+        <button :class="{ active: tab === 'desc' }" @click="tab = 'desc'">О товаре</button>
+        <button :class="{ active: tab === 'delivery' }" @click="tab = 'delivery'">Доставка</button>
+      </div>
+      <div class="tab-content">
+        <p v-if="tab === 'desc'">
+          <strong>О товаре:</strong> {{ product.composition }}<br />
+          <strong>Описание:</strong> {{ product.description }}
+        </p>
+        <p v-else>Бесплатно курьерской службой по всей России (с 9:00 до 18:00 по местному времени)</p>
+      </div>
     </div>
   </div>
 </template>
@@ -86,7 +95,6 @@ const prevImage = () => {
 const onColorChange = () => {
   const variant = product.value?.variants.find(v => v.color.id === selectedColorId.value);
   if (variant?.stocks.length) {
-    // ИСПРАВЛЕНО: снова устанавливаем selectedSizeId как ID первого размера, а не ID склада
     selectedSizeId.value = variant.stocks[0].size.id;
   }
   currentImageIndex.value = 0;
@@ -99,8 +107,6 @@ const addToCart = async () => {
   }
 
   const variant = product.value?.variants.find(v => v.color.id === selectedColorId.value);
-  // ИСПРАВЛЕНО: теперь selectedSizeId — это ID размера, а не ID склада
-  // Поэтому мы ищем в stocks именно по s.size.id, и находим правильный объект stock
   const stock = variant?.stocks.find(s => s.size.id === selectedSizeId.value);
   if (!stock) {
     return alert('Выбранного размера нет в наличии');
@@ -123,7 +129,6 @@ const loadProduct = async (newSlug) => {
     const res = await api.getProductBySlug(newSlug);
     product.value = res.data;
 
-    // ИСПРАВЛЕНО: при загрузке нового товара сразу ставим цвет/размер так же, используя size.id
     const defaultVariant = product.value.variants[0];
     selectedColorId.value = defaultVariant?.color?.id || null;
     selectedSizeId.value = defaultVariant?.stocks[0]?.size?.id || null;
@@ -145,7 +150,6 @@ watch(
   }
 );
 </script>
-
 
 <style scoped>
 .product-detail {
@@ -185,9 +189,19 @@ watch(
   flex-direction: column;
   gap: 10px;
 }
+.details h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.price {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
 .price .sale {
   color: red;
   margin-right: 10px;
+  font-weight: 600;
 }
 .price .old {
   text-decoration: line-through;
@@ -197,14 +211,29 @@ watch(
   display: flex;
   flex-direction: column;
   gap: 4px;
+  margin-bottom: 1rem;
+}
+.selector label {
+  font-weight: 500;
+  color: #555;
+}
+.selector select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 .add-to-cart {
-  padding: 8px;
+  padding: 10px 16px;
   background: black;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+.add-to-cart:hover {
+  background-color: #333;
 }
 .tabs {
   display: flex;
@@ -216,6 +245,8 @@ watch(
   border: none;
   background: lightgray;
   cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s ease;
 }
 .tabs button.active {
   background: black;
@@ -223,5 +254,33 @@ watch(
 }
 .tab-content {
   margin-top: 10px;
+}
+@media (min-width: 768px) {
+  .product-detail {
+    padding: 40px;
+  }
+  .details h1 {
+    font-size: 2rem;
+  }
+  .price {
+    font-size: 1.5rem;
+  }
+}
+@media (max-width: 767px) {
+  .product-detail {
+    flex-direction: column;
+    padding: 10px;
+  }
+  .carousel-container,
+  .details {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+  .details h1 {
+    font-size: 1.5rem;
+  }
+  .price {
+    font-size: 1.25rem;
+  }
 }
 </style>
