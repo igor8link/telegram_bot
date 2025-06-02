@@ -255,4 +255,4 @@ class OrderSerializer(serializers.ModelSerializer):
             'id', 'user', 'full_name', 'email', 'phone', 'address',
             'total_price', 'status', 'items', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'total_price', 'status', 'user']
