@@ -67,10 +67,10 @@ export const useCartStore = defineStore('cart', () => {
   };
 
   // Автоматическая загрузка корзины при запуске
-  const authStore = useAuthStore();
-  if (authStore.token || !authStore.token) {
-    loadCart();
-  }
+  // const authStore = useAuthStore();
+  // if (authStore.token || !authStore.token) {
+  //   loadCart();
+  // }
 
   return {
     items,

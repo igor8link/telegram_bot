@@ -48,22 +48,23 @@
         >
           <!-- Компонент с изображением/названием/ссылкой на товар -->
           <div class="item-info">
+            <!-- Передаём в ProductCard уже собранный объект product_info -->
             <ProductCard 
-              :product="getProductFromCart(item)" 
+              :product="item.product_info" 
               :showAddToCartButton="false"
             />
           </div>
 
           <div class="item-details">
-            <!-- Например, отображаем цвет/размер: -->
+            <!-- Цвет и размер из product_info -->
             <p class="item-variant">
-              Цвет: {{ item.product_stock.variant.color.name }}, 
-              Размер: {{ item.product_stock.size.name }}
+              Цвет: {{ item.product_info.color }}, 
+              Размер: {{ item.product_info.size }}
             </p>
             <!-- Цена за единицу и общая цена -->
             <p class="item-price">
-              {{ formatPrice(item.product_stock.variant.product.sale_price || item.product_stock.variant.product.price) }} × {{ item.quantity }} = 
-              <strong>{{ formatPrice(getItemTotal(item)) }}</strong>
+              {{ formatPrice(item.product_info.price) }} × {{ item.quantity }} = 
+              <strong>{{ formatPrice(item.product_info.total_price) }}</strong>
             </p>
 
             <!-- Управление количеством -->
@@ -108,6 +109,7 @@
   </div>
 </template>
 
+
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useCartStore } from '@/stores/cartStore';
@@ -121,22 +123,24 @@ const authStore = useAuthStore();
 const loading = computed(() => cartStore.loading);
 const cartItems = computed(() => cartStore.items);
 const totalPrice = computed(() => cartStore.totalPrice);
+
+// Подсчёт общего количества товаров
 const totalQuantity = computed(() =>
   cartStore.items.reduce((sum, item) => sum + item.quantity, 0)
 );
 
-const formattedTotalPrice = computed(() => formatPrice(totalPrice.value));
-
-// При загрузке страницы
-onMounted(() => {
-  cartStore.loadCart();
-});
-
+// Отображение цены в формате ₽
 const formatPrice = (value) => {
   if (typeof value !== 'number') return '';
   return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(value);
 };
 
+const formattedTotalPrice = computed(() => formatPrice(totalPrice.value));
+
+// Переменные для “ошибок” и “повторного запроса”
+const error = ref(null);
+
+// Функция, возвращающая правильное слово «товар/товара/товаров»
 const getProductWord = (count) => {
   const lastDigit = count % 10;
   const lastTwoDigits = count % 100;
@@ -146,10 +150,7 @@ const getProductWord = (count) => {
   return 'товаров';
 };
 
-const getProductFromCart = (item) => {
-  return item.product_stock.variant.product;
-};
-
+// Управление количеством
 const changeQuantity = (item, newQty) => {
   if (newQty < 1) return;
   item.quantity = newQty;
@@ -161,11 +162,27 @@ const onQuantityInput = (item) => {
   cartStore.updateItem(item.id, item.quantity);
 };
 
+// Удаление позиции
 const removeItem = (itemId) => {
   cartStore.removeItem(itemId);
 };
 
+// Функция загрузки корзины с обработкой ошибок
+const fetchCart = async () => {
+  error.value = null;
+  try {
+    await cartStore.loadCart();
+  } catch (e) {
+    error.value = 'Ошибка загрузки корзины';
+    console.error(e);
+  }
+};
+
+onMounted(() => {
+  fetchCart();
+});
 </script>
+
 
 <style scoped>
 .cart-page {

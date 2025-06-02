@@ -13,9 +13,11 @@ app.use(router)
 const initializeStores = async () => {
   const { useAuthStore } = await import('./stores/authStore')
   const { useFavoriteStore } = await import('./stores/favoriteStore')
+  const { useCartStore } = await import('./stores/cartStore')
   
   const authStore = useAuthStore()
   const favoriteStore = useFavoriteStore()
+  const cartStore = useCartStore()
   
   // Initialize auth first
   await authStore.initializeAuth()
@@ -27,6 +29,11 @@ const initializeStores = async () => {
     } catch (error) {
       console.error('Failed to load favorites:', error)
     }
+  }
+  try {
+    await cartStore.loadCart()
+  } catch (error) {
+    console.error('Failed to load cart:', error)
   }
 }
 

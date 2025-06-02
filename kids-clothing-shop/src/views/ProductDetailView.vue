@@ -53,12 +53,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';           // ИСПРАВЛЕНО: добавили `watch`
 import { useRoute } from 'vue-router';
 import api from '@/services/api';
 
 const route = useRoute();
-const slug = route.params.slug;
+const slug = ref(route.params.slug);
 
 const product = ref(null);
 const selectedColorId = ref(null);
@@ -114,19 +114,35 @@ const addToCart = async () => {
   }
 };
 
-onMounted(async () => {
+const loadProduct = async (newSlug) => {                          // ИСПРАВЛЕНО: выносим логику загрузки в отдельную функцию
   try {
-    const res = await api.getProductBySlug(slug);
+    const res = await api.getProductBySlug(newSlug);
     product.value = res.data;
 
+    // ИСПРАВЛЕНО: сбрасываем выбранные цвет и размер при каждой загрузке нового товара
     const defaultVariant = product.value.variants[0];
     selectedColorId.value = defaultVariant?.color?.id || null;
     selectedSizeId.value = defaultVariant?.stocks[0]?.size?.id || null;
+    currentImageIndex.value = 0;
   } catch (error) {
     console.error('Ошибка загрузки товара:', error);
   }
+};
+
+onMounted(() => {
+  loadProduct(slug.value);
 });
+
+// ИСПРАВЛЕНО: следим за изменением route.params.slug и при ребайде разбираем новый товар
+watch(
+  () => route.params.slug,
+  (newSlug) => {
+    slug.value = newSlug;
+    loadProduct(newSlug);
+  }
+);
 </script>
+
 
 <style scoped>
 .product-detail {
