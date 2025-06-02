@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '@/stores/authStore';
 import HomeView from '@/views/HomeView.vue';
+import { useCartStore } from '@/stores/cartStore';
 
 const routes = [
   {
@@ -63,6 +64,21 @@ const routes = [
     name: 'product-detail',
     component: () => import('@/views/ProductDetailView.vue'),
     meta: { title: 'Товар' }
+  },
+  {
+    path: '/checkout',
+    name: 'checkout',
+    component: () => import('@/views/CheckoutView.vue'),
+    meta: { title: 'Оформление заказа', requiresAuth: true },
+    beforeEnter: (to, from, next) => {
+      const cartStore = useCartStore();
+      // Если корзина пуста, перекидываем обратно в Cart
+      if (cartStore.totalItems === 0) {
+        next({ name: 'cart' });
+      } else {
+        next();
+      }
+    }
   },
   // {
   //   path: '/checkout',
