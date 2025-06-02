@@ -19,7 +19,7 @@
 
       <div class="selector">
         <label>Цвет:</label>
-        <select v-model="selectedColorId" @change="onColorChange">
+        <select v-model.number="selectedColorId" @change="onColorChange">
           <option v-for="variant in product.variants" :key="variant.id" :value="variant.color.id">
             {{ variant.color.name }}
           </option>
@@ -28,7 +28,7 @@
 
       <div class="selector">
         <label>Размер:</label>
-        <select v-model="selectedSizeId">
+        <select v-model.number="selectedSizeId">
           <option v-for="size in availableSizes" :key="size.id" :value="size.id">
             {{ size.size.name }}
           </option>
@@ -43,7 +43,7 @@
       </div>
       <div class="tab-content">
         <p v-if="tab === 'desc'">
-          <strong>Состав:</strong> {{ product.composition }}<br />
+          <strong>О товаре:</strong> {{ product.composition }}<br />
           <strong>Описание:</strong> {{ product.description }}
         </p>
         <p v-else>Бесплатно курьерской службой по всей России (с 9:00 до 18:00 по местному времени)</p>
@@ -99,12 +99,12 @@ const addToCart = async () => {
   }
 
   const variant = product.value?.variants.find(v => v.color.id === selectedColorId.value);
-  const stock = variant?.stocks.find(s => s.size.id === Number(selectedSizeId.value));
+  const stock = variant?.stocks.find(s => s.size.id === selectedSizeId.value);
   if (!stock) return alert('Выбранного размера нет в наличии');
 
   try {
     await api.addToCart({
-      product_stock: stock.id,
+      product_stock_id: stock.id,
       quantity: 1
     });
     alert('Товар добавлен в корзину');

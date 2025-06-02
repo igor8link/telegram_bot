@@ -27,7 +27,7 @@ export const useCartStore = defineStore('cart', () => {
   const addItem = async ({ productStockId, quantity = 1 }) => {
     try {
       const response = await api.addToCart({
-        product_stock: productStockId,
+        product_stock_id: productStockId,
         quantity
       });
 

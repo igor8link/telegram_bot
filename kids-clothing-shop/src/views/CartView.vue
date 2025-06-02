@@ -113,33 +113,30 @@ import { ref, computed, onMounted } from 'vue';
 import { useCartStore } from '@/stores/cartStore';
 import { useAuthStore } from '@/stores/authStore';
 import AppHeader from '@/components/AppHeader.vue';
-import ProductCard from '@/components/ProductCart.vue'; // убедитесь, что ваш компонент называется именно так
+import ProductCard from '@/components/ProductCart.vue';
 
 const cartStore = useCartStore();
 const authStore = useAuthStore();
 
 const loading = computed(() => cartStore.loading);
-const error = computed(() => cartStore.error);
-const cartItems = computed(() => cartStore.cartItems);
-const updatingId = computed(() => cartStore.updatingId);
+const cartItems = computed(() => cartStore.items);
+const totalPrice = computed(() => cartStore.totalPrice);
+const totalQuantity = computed(() =>
+  cartStore.items.reduce((sum, item) => sum + item.quantity, 0)
+);
 
-// Форматирует цену, например, 1234.5 → "1 234,50 ₽"
+const formattedTotalPrice = computed(() => formatPrice(totalPrice.value));
+
+// При загрузке страницы
+onMounted(() => {
+  cartStore.loadCart();
+});
+
 const formatPrice = (value) => {
   if (typeof value !== 'number') return '';
   return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(value);
 };
 
-// Вспомогательный геттер: внутри cartItem есть product_stock.variant.product
-const getProductFromCart = (item) => {
-  return item.product_stock.variant.product;
-};
-
-// Общая сумма
-const totalPrice = computed(() => cartStore.totalPrice);
-const formattedTotalPrice = computed(() => formatPrice(totalPrice.value));
-const totalQuantity = computed(() => cartStore.totalQuantity);
-
-// Склонение слова «товар»
 const getProductWord = (count) => {
   const lastDigit = count % 10;
   const lastTwoDigits = count % 100;
@@ -149,33 +146,25 @@ const getProductWord = (count) => {
   return 'товаров';
 };
 
-// При маунте – загружаем корзину
-const fetchCart = async () => {
-  await cartStore.fetchCart();
+const getProductFromCart = (item) => {
+  return item.product_stock.variant.product;
 };
 
-// Изменить количество (кнопки + и –)
 const changeQuantity = (item, newQty) => {
   if (newQty < 1) return;
   item.quantity = newQty;
-  // После изменения локального поля уходим в API/локальный стор
-  cartStore.updateCartItem(item);
+  cartStore.updateItem(item.id, newQty);
 };
 
-// Если пользователь ввёл число вручную
 const onQuantityInput = (item) => {
   if (item.quantity < 1) item.quantity = 1;
-  cartStore.updateCartItem(item);
+  cartStore.updateItem(item.id, item.quantity);
 };
 
-// Удалить позицию
 const removeItem = (itemId) => {
-  cartStore.removeFromCart(itemId);
+  cartStore.removeItem(itemId);
 };
 
-onMounted(() => {
-  fetchCart();
-});
 </script>
 
 <style scoped>
