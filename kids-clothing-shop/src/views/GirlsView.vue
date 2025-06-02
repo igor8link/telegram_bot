@@ -130,30 +130,24 @@ const loading = ref(true);
 const girlsCarouselSlides = ref([
   {
     id: 1,
-    image: '/images/placeholder-carousel.jpg',
+    image: new URL('@/assets/images/banner_01.png', import.meta.url).href,
     alt: 'Новая коллекция для девочек',
     title: 'НОВАЯ КОЛЛЕКЦИЯ',
     subtitle: 'Красивая одежда для девочек',
-    buttonText: 'СМОТРЕТЬ',
-    buttonLink: '/categories/girls/new'
   },
   {
     id: 2,
-    image: '/images/placeholder-carousel.jpg',
+    image: new URL('@/assets/images/banner_for_girls1.png', import.meta.url).href,
     alt: 'Праздничные платья',
     title: 'ПРАЗДНИЧНАЯ КОЛЛЕКЦИЯ',
     subtitle: 'Нарядные платья и костюмы',
-    buttonText: 'В КАТАЛОГ',
-    buttonLink: '/categories/girls/party'
   },
   {
     id: 3,
-    image: '/images/placeholder-carousel.jpg',
+    image: new URL('@/assets/images/banner_for_girls2.png', import.meta.url).href,
     alt: 'Школьная форма',
     title: 'ШКОЛЬНАЯ ФОРМА',
     subtitle: 'Стильная и удобная форма',
-    buttonText: 'ВЫБРАТЬ',
-    buttonLink: '/categories/girls/school'
   }
 ]);
 

@@ -50,6 +50,7 @@
 <script setup>
 import { ref, watch, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import AppHeader from '@/components/AppHeader.vue';
 import api from '@/services/api';
 import ProductCard from '@/components/ProductCart.vue';
 

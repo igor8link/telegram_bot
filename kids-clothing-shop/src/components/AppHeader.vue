@@ -1,14 +1,17 @@
 <template>
   <header class="header" :class="{ 'scrolled': scrolled }">
     <div class="header-content">
-      <button class="menu-button" @click="toggleMenu">
-        <span class="menu-icon"></span>
-      </button>
+      <!-- Левый блок: кнопка меню и логотип -->
+      <div class="header-left">
+        <button class="menu-button" @click="toggleMenu">
+          <span class="menu-icon"></span>
+        </button>
+        <router-link to="/" class="logo">
+          <img src="@/assets/shirt-clothes-svgrepo-com.png" alt="kids" />
+        </router-link>
+      </div>
       
-      <router-link to="/" class="logo">
-        <img src="@/assets/logo.svg" alt="kids" />
-      </router-link>
-      
+      <!-- Правый блок: иконки поиска, профиля, избранного и корзины -->
       <div class="header-actions">
         <button class="action-button" @click="toggleSearch">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon">
@@ -181,7 +184,7 @@ onUnmounted(() => {
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #2160d5e9;
+  background-color: #ffffff;
   z-index: 1000;
   transition: box-shadow 0.3s ease;
 }
@@ -192,14 +195,18 @@ onUnmounted(() => {
 
 .header-content {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  height: 60px;
+  height: 88px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
 }
 
 .logo {
-  height: 30px;
+  height: 40px;
 }
 
 .logo img {
@@ -215,6 +222,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-right: 12px;
 }
 
 .menu-icon {
@@ -245,6 +253,7 @@ onUnmounted(() => {
 }
 
 .header-actions {
+  margin-left: auto;
   display: flex;
   gap: 16px;
 }

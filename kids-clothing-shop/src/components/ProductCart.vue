@@ -60,6 +60,10 @@
           {{ formatPrice(product.price) }}
         </span>
       </div>
+      <router-link
+       :to="`/products/${product.slug}`"
+       class="buy-button"
+       >Купить</router-link>
     </div>
   </div>
 </template>
@@ -328,7 +332,24 @@ const formatPrice = (price) => {
   color: #999;
 }
 
-/* Responsive adjustments */
+.buy-button {
+  display: inline-block;
+  margin-top: 8px;              
+  padding: 8px 16px;            
+  background-color: #000;       
+  color: #fff;                  
+  text-align: center;
+  border-radius: 4px;           
+  text-decoration: none;        
+  font-size: 0.875rem;          
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.buy-button:hover {
+  background-color: #333;       
+}
+
 @media (max-width: 768px) {
   .product-card {
     border-radius: 6px;
@@ -350,6 +371,11 @@ const formatPrice = (price) => {
   
   .cart-button {
     right: 48px;
+  }
+
+  .buy-button {
+    padding: 6px 12px;
+    font-size: 0.875rem;
   }
 }
 </style>
