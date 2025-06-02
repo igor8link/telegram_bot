@@ -48,7 +48,6 @@
         >
           <!-- Компонент с изображением/названием/ссылкой на товар -->
           <div class="item-info">
-            <!-- Передаём в ProductCard уже собранный объект product_info -->
             <ProductCard 
               :product="item.product_info" 
               :showAddToCartButton="false"
@@ -109,7 +108,6 @@
   </div>
 </template>
 
-
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useCartStore } from '@/stores/cartStore';
@@ -140,7 +138,9 @@ const formattedTotalPrice = computed(() => formatPrice(totalPrice.value));
 // Переменные для “ошибок” и “повторного запроса”
 const error = ref(null);
 
-// Функция, возвращающая правильное слово «товар/товара/товаров»
+// **ИСПРАВЛЕНО**: добавляем переменную `updatingId`
+const updatingId = ref(null);
+
 const getProductWord = (count) => {
   const lastDigit = count % 10;
   const lastTwoDigits = count % 100;
@@ -150,21 +150,42 @@ const getProductWord = (count) => {
   return 'товаров';
 };
 
-// Управление количеством
-const changeQuantity = (item, newQty) => {
+// **ИСПРАВЛЕНО**: ставим `updatingId` перед началом запроса и сбрасываем после
+const changeQuantity = async (item, newQty) => {
   if (newQty < 1) return;
-  item.quantity = newQty;
-  cartStore.updateItem(item.id, newQty);
+  updatingId.value = item.id;
+  try {
+    await cartStore.updateItem(item.id, newQty);
+    item.quantity = newQty;
+  } catch (e) {
+    console.error('Ошибка обновления количества:', e);
+  } finally {
+    updatingId.value = null;
+  }
 };
 
-const onQuantityInput = (item) => {
+const onQuantityInput = async (item) => {
   if (item.quantity < 1) item.quantity = 1;
-  cartStore.updateItem(item.id, item.quantity);
+  updatingId.value = item.id;
+  try {
+    await cartStore.updateItem(item.id, item.quantity);
+  } catch (e) {
+    console.error('Ошибка обновления количества:', e);
+  } finally {
+    updatingId.value = null;
+  }
 };
 
-// Удаление позиции
-const removeItem = (itemId) => {
-  cartStore.removeItem(itemId);
+// **ИСПРАВЛЕНО**: ставим `updatingId` перед удалением и сбрасываем после
+const removeItem = async (itemId) => {
+  updatingId.value = itemId;
+  try {
+    await cartStore.removeItem(itemId);
+  } catch (e) {
+    console.error('Ошибка удаления товара из корзины:', e);
+  } finally {
+    updatingId.value = null;
+  }
 };
 
 // Функция загрузки корзины с обработкой ошибок
@@ -182,7 +203,6 @@ onMounted(() => {
   fetchCart();
 });
 </script>
-
 
 <style scoped>
 .cart-page {

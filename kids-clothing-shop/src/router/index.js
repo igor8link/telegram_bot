@@ -47,22 +47,6 @@ const routes = [
   // },
   // // Error pages
   // {
-  //   path: '/404',
-  //   name: 'not-found',
-  //   component: () => import('@/views/NotFoundView.vue'),
-  //   meta: { title: 'Страница не найдена' }
-  // },
-  // {
-  //   path: '/:pathMatch(.*)*',
-  //   redirect: '/404'
-  // }
-  // {
-  //   path: '/categories/:gender',
-  //   name: 'categories',
-  //   component: () => import('@/views/CategoryView.vue'),
-  //   meta: { title: 'Категории' }
-  // },
-  // {
   //   path: '/categories/:gender/:slug',
   //   name: 'category',
   //   component: () => import('@/views/CategoryDetailView.vue'),
