@@ -5,22 +5,16 @@
     <div class="container">
       <h1 class="page-title">Мои заказы</h1>
 
-      <!-- Если всё ещё идёт загрузка -->
       <div v-if="loading" class="orders-loading">
         <div class="spinner"></div>
         <p>Загрузка заказов...</p>
       </div>
-
-      <!-- Если после загрузки нет ни одного заказа -->
       <div v-else-if="orders.length === 0" class="orders-empty">
         <p>У вас пока нет заказов.</p>
         <router-link to="/" class="back-to-shop">Вернуться в каталог</router-link>
       </div>
-
-      <!-- Список заказов -->
       <div v-else class="orders-list">
         <div v-for="order in orders" :key="order.id" class="order-card">
-          <!-- HEADER ЗАКАЗА: номер, дата, статус -->
           <div class="order-header">
             <div class="order-header-left">
               <h2 class="order-number">Заказ №{{ order.id }}</h2>
@@ -33,7 +27,6 @@
 
           <hr class="order-separator" />
 
-          <!-- ТОВАРЫ В ЗАКАЗЕ -->
           <div class="order-items">
             <div 
               v-for="item in order.items" 
@@ -51,8 +44,6 @@
           </div>
 
           <hr class="order-separator" />
-
-          <!-- ИТОГ ПО ЗАКАЗУ -->
           <div class="order-footer">
             <span class="order-total-label">Всего:</span>
             <span class="order-total-price">{{ order.total_price }}</span>
@@ -66,15 +57,13 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import api from '@/services/api';       // здесь – ваш axios-инстанс или аналог
+import api from '@/services/api';       
 import AppHeader from '@/components/AppHeader.vue';
 
-// Состояния
 const orders = ref([]);
 const loading = ref(false);
 const router = useRouter();
 
-// Загрузка списка заказов текущего юзера
 const fetchOrders = async () => {
   loading.value = true;
   try {
@@ -141,9 +130,9 @@ onMounted(fetchOrders);
 </script>
 
 <style scoped>
-/* ---------- ОБЩИЕ СТИЛИ ---------- */
 .orders-page {
   padding-bottom: 40px;
+  padding-top: 88px;
   background-color: var(--color-background);
   min-height: 100vh;
 }
