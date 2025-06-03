@@ -5,7 +5,11 @@
         <!-- Product Image -->
         <div class="product-image-wrapper">
           <img 
-            :src="mainImage" 
+            :src="
+              product.main_image_url || 
+              product.image        || 
+              product.image_url
+            "  
             :alt="product.title" 
             class="product-image"
           >
