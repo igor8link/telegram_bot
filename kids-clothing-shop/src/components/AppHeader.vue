@@ -71,7 +71,6 @@
         <router-link to="/new-arrivals" class="side-nav-item" @click="toggleMenu">НОВИНКИ</router-link>
         <router-link to="/sale" class="side-nav-item" @click="toggleMenu">РАСПРОДАЖА</router-link>
         <router-link to="/about" class="side-nav-item" @click="toggleMenu">О НАС</router-link>
-        <router-link to="/delivery" class="side-nav-item" @click="toggleMenu">ДОСТАВКА</router-link>
       </nav>
     </div>
     

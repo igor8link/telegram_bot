@@ -213,7 +213,6 @@ import AppHeader from '@/components/AppHeader.vue';
   color: #222;
 }
 
-/* Оглавление */
 .toc {
   margin-bottom: 2rem;
 }
