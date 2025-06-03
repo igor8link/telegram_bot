@@ -1,5 +1,6 @@
 <template>
-  <div class="product-detail" v-if="product">
+  <AppHeader />
+  <div class="product-detail with-header-offset" v-if="product">
     <div class="carousel-wrapper">
       <Carousel 
        :slides="detailSlides" 
@@ -68,6 +69,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import api from '@/services/api';
+import AppHeader from '@/components/AppHeader.vue';
 import Carousel from '@/components/Carousel.vue';
 
 
@@ -164,11 +166,14 @@ watch(
 </script>
 
 <style scoped>
+.with-header-offset {
+  margin-top: 88px;
+}
 .product-detail {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
-  padding: 20px;
+  padding: 0 20px 20px;
 }
 .carousel-wrapper {
   flex: 1 1 45%;
