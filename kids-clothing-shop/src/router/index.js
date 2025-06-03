@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '@/stores/authStore';
 import HomeView from '@/views/HomeView.vue';
-import OrdersView from '@/views/OrdersView.vue';
 import { useCartStore } from '@/stores/cartStore';
 
 const routes = [
@@ -83,8 +82,13 @@ const routes = [
   {
     path: '/orders',
     name: 'orders',
-    component: OrdersView,
+    component: () => import('@/views/OrdersView.vue'),
     meta: { requiresAuth: true } 
+  },
+  {
+    path: '/privacy',
+    name: 'privacy',
+    component: () => import('@/views/PrivacyView.vue'),
   },
   // // Error pages
   // {
