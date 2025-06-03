@@ -66,12 +66,6 @@ export const useCartStore = defineStore('cart', () => {
     items.value = [];
   };
 
-  // Автоматическая загрузка корзины при запуске
-  // const authStore = useAuthStore();
-  // if (authStore.token || !authStore.token) {
-  //   loadCart();
-  // }
-
   return {
     items,
     totalItems,

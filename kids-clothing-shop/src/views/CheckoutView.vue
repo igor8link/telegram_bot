@@ -5,14 +5,13 @@
     <div class="container">
       <h1>Оформление заказа</h1>
 
-      <!-- Если корзина пуста, не показываем форму -->
+
       <div v-if="cartItems.length === 0" class="empty-cart">
         <p>Ваша корзина пуста. <router-link to="/cart">Перейти в корзину</router-link></p>
       </div>
 
-      <!-- Форма и обзор заказа -->
+
       <div v-else class="checkout-content">
-        <!-- Секция с данными покупателя -->
         <form @submit.prevent="submitOrder" class="checkout-form">
           <div class="form-group">
             <label for="full_name">ФИО</label>
@@ -71,7 +70,6 @@
           </button>
         </form>
 
-        <!-- Секция с обзором корзины -->
         <div class="order-summary">
           <h2>Ваш заказ</h2>
           <div
@@ -108,7 +106,6 @@
         </div>
       </div>
 
-      <!-- После удачной отправки показываем сообщение -->
       <div v-if="orderSuccess" class="success-message">
         <h2>Спасибо за ваш заказ!</h2>
         <p>Ваш заказ №{{ createdOrderId }} успешно создан.</p>
@@ -125,7 +122,7 @@ import { useRouter } from 'vue-router';
 import { useCartStore } from '@/stores/cartStore';
 import api from '@/services/api';
 
-// Форма заказа
+
 const form = ref({
   full_name: '',
   email: '',
@@ -141,18 +138,14 @@ const createdOrderId = ref(null);
 const cartStore = useCartStore();
 const router = useRouter();
 
-// Загружаем корзину при монтировании (на всякий случай)
 onMounted(async () => {
   await cartStore.loadCart();
 });
 
-// Данные корзины
 const cartItems = computed(() => cartStore.items);
 const formattedTotalPrice = computed(() => formatPrice(cartStore.totalPrice));
 
-// Функция форматирования цены (можно вынести в утилиты)
 function formatPrice(value) {
-  // В локали «ru-RU» разделитель « » и запятая как разделитель копеек
   return new Intl.NumberFormat('ru-RU', {
     style: 'currency',
     currency: 'RUB',
@@ -160,7 +153,6 @@ function formatPrice(value) {
   }).format(value);
 }
 
-// Обработчик отправки формы
 async function submitOrder() {
   error.value = '';
   if (!form.value.full_name || !form.value.email || !form.value.phone || !form.value.address) {
@@ -170,7 +162,7 @@ async function submitOrder() {
 
   submitting.value = true;
   try {
-    // Передаём только поля, которые ожидает сервер:
+
     const orderPayload = {
       full_name: form.value.full_name,
       email: form.value.email,
@@ -179,14 +171,13 @@ async function submitOrder() {
     };
 
     const response = await api.createOrder(orderPayload);
-    // В ответе придёт сериализованный заказ, включая его id
+
     createdOrderId.value = response.data.id;
     orderSuccess.value = true;
 
-    // Очищаем локальную корзину
     cartStore.clearCart();
   } catch (e) {
-    // Обрабатываем типичные ошибки
+
     if (e.response && e.response.data && e.response.data.error) {
       error.value = e.response.data.error;
     } else {
@@ -211,7 +202,7 @@ async function submitOrder() {
 h1 {
   margin-bottom: 20px;
 }
-/* Общие стили для формы */
+
 .checkout-form {
   background: #f9f9f9;
   padding: 20px;
@@ -251,7 +242,6 @@ h1 {
   cursor: not-allowed;
 }
 
-/* Стили для раздела «Ваш заказ» */
 .order-summary {
   background: #fff;
   padding: 20px;
@@ -302,7 +292,6 @@ h1 {
   font-size: 18px;
 }
 
-/* Сообщение об успешном оформлении */
 .success-message {
   text-align: center;
   margin-top: 40px;

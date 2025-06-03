@@ -10,7 +10,7 @@
         </p>
       </div>
 
-      <!-- Loader / Ошибка -->
+      <!--  Ошибка -->
       <div v-if="loading" class="loading-container">
         <div class="loading-spinner"></div>
         <p>Загрузка корзины...</p>
@@ -46,7 +46,6 @@
           :key="item.id" 
           class="cart-item"
         >
-          <!-- Компонент с изображением/названием/ссылкой на товар -->
           <div class="item-info">
             <ProductCard 
               :product="item.product_info" 
@@ -55,35 +54,14 @@
           </div>
 
           <div class="item-details">
-            <!-- Цвет и размер из product_info -->
             <p class="item-variant">
               Цвет: {{ item.product_info.color }}, 
               Размер: {{ item.product_info.size }}
             </p>
-            <!-- Цена за единицу и общая цена -->
             <p class="item-price">
               {{ formatPrice(item.product_info.price) }} × {{ item.quantity }} = 
               <strong>{{ formatPrice(item.product_info.total_price) }}</strong>
             </p>
-
-            <!-- Управление количеством -->
-            <div class="quantity-control">
-              <button 
-                @click="changeQuantity(item, item.quantity - 1)" 
-                :disabled="item.quantity <= 1 || updatingId === item.id"
-              >–</button>
-              <input 
-                type="number" 
-                v-model.number="item.quantity" 
-                @change="onQuantityInput(item)" 
-                min="1" 
-                :disabled="updatingId === item.id"
-              />
-              <button 
-                @click="changeQuantity(item, item.quantity + 1)" 
-                :disabled="updatingId === item.id"
-              >+</button>
-            </div>
 
             <!-- Кнопка удаления -->
             <button 
@@ -96,7 +74,6 @@
           </div>
         </div>
 
-        <!-- Подвал корзины: итоговая сумма и кнопка перейти к оформлению -->
         <div class="cart-summary">
           <p>Итого: <strong>{{ formattedTotalPrice }}</strong></p>
           <router-link to="/checkout" class="checkout-button">
@@ -135,10 +112,8 @@ const formatPrice = (value) => {
 
 const formattedTotalPrice = computed(() => formatPrice(totalPrice.value));
 
-// Переменные для “ошибок” и “повторного запроса”
 const error = ref(null);
 
-// **ИСПРАВЛЕНО**: добавляем переменную `updatingId`
 const updatingId = ref(null);
 
 const getProductWord = (count) => {
@@ -150,33 +125,6 @@ const getProductWord = (count) => {
   return 'товаров';
 };
 
-// **ИСПРАВЛЕНО**: ставим `updatingId` перед началом запроса и сбрасываем после
-const changeQuantity = async (item, newQty) => {
-  if (newQty < 1) return;
-  updatingId.value = item.id;
-  try {
-    await cartStore.updateItem(item.id, newQty);
-    item.quantity = newQty;
-  } catch (e) {
-    console.error('Ошибка обновления количества:', e);
-  } finally {
-    updatingId.value = null;
-  }
-};
-
-const onQuantityInput = async (item) => {
-  if (item.quantity < 1) item.quantity = 1;
-  updatingId.value = item.id;
-  try {
-    await cartStore.updateItem(item.id, item.quantity);
-  } catch (e) {
-    console.error('Ошибка обновления количества:', e);
-  } finally {
-    updatingId.value = null;
-  }
-};
-
-// **ИСПРАВЛЕНО**: ставим `updatingId` перед удалением и сбрасываем после
 const removeItem = async (itemId) => {
   updatingId.value = itemId;
   try {
@@ -332,7 +280,6 @@ onMounted(() => {
 
 .item-info {
   flex: 1;
-  /* Здесь рендерится <ProductCard> без кнопки "Добавить в корзину" */
 }
 
 .item-details {
@@ -426,7 +373,7 @@ onMounted(() => {
   opacity: 0.9;
 }
 
-/* Адаптив */
+
 @media (max-width: 768px) {
   .container { padding: 1rem; }
   .cart-item { flex-direction: column; }

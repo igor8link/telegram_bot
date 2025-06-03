@@ -2,12 +2,10 @@
       <AppHeader />
   <div class="boys-page">
     <main class="main-content">
-      <!-- Boys Hero Carousel -->
       <section class="hero-carousel">
         <Carousel :slides="boysCarouselSlides" />
       </section>
-      
-      <!-- New Products Section -->
+
       <section class="section">
         <div class="container">
           <ProductsGrid 
@@ -18,18 +16,15 @@
           />
         </div>
       </section>
-      
-      <!-- Boys Categories Grid -->
+
       <section class="section categories-section">
         <div class="container">
           <h2 class="section-title">КАТЕГОРИИ ДЛЯ МАЛЬЧИКОВ</h2>
-          
-          <!-- Loading state -->
+
           <div v-if="loading" class="loading-container">
             <p>Загрузка категорий...</p>
           </div>
-          
-          <!-- Categories Grid -->
+
           <div v-else-if="boysCategories.length > 0" class="categories-grid">
             <router-link 
               v-for="category in boysCategories" 
@@ -58,57 +53,8 @@
             </router-link>
           </div>
           
-          <!-- No categories message -->
           <div v-else class="no-categories">
             <p>Категории для мальчиков пока не добавлены</p>
-          </div>
-        </div>
-      </section>
-      
-      <!-- Featured Collections -->
-      <section class="section featured-section">
-        <div class="container">
-          <h2 class="section-title">ПОПУЛЯРНЫЕ КОЛЛЕКЦИИ</h2>
-          <div class="featured-grid">
-            <div class="featured-item large">
-              <router-link to="/categories/boys/sportswear" class="featured-link">
-                <div class="featured-image">
-                  <div class="image-placeholder sport-placeholder">
-                    <div class="placeholder-content">
-                      <div class="placeholder-icon">⚽</div>
-                      <h3>СПОРТИВНАЯ ОДЕЖДА</h3>
-                      <p>Комфорт и стиль для активных мальчиков</p>
-                    </div>
-                  </div>
-                </div>
-              </router-link>
-            </div>
-            
-            <div class="featured-item">
-              <router-link to="/categories/boys/casual" class="featured-link">
-                <div class="featured-image">
-                  <div class="image-placeholder casual-placeholder">
-                    <div class="placeholder-content">
-                      <div class="placeholder-icon">👕</div>
-                      <h4>ПОВСЕДНЕВНАЯ ОДЕЖДА</h4>
-                    </div>
-                  </div>
-                </div>
-              </router-link>
-            </div>
-            
-            <div class="featured-item">
-              <router-link to="/categories/boys/formal" class="featured-link">
-                <div class="featured-image">
-                  <div class="image-placeholder formal-placeholder">
-                    <div class="placeholder-content">
-                      <div class="placeholder-icon">👔</div>
-                      <h4>НАРЯДНАЯ ОДЕЖДА</h4>
-                    </div>
-                  </div>
-                </div>
-              </router-link>
-            </div>
           </div>
         </div>
       </section>
@@ -123,10 +69,10 @@ import Carousel from '@/components/Carousel.vue';
 import ProductsGrid from '@/components/ProductsGrid.vue';
 import api from '@/services/api';
 
-// Loading state
+
 const loading = ref(true);
 
-// Carousel slides for boys
+
 const boysCarouselSlides = ref([
   {
     id: 1,
@@ -150,10 +96,8 @@ const boysCarouselSlides = ref([
   }
 ]);
 
-// Boys categories from API
 const boysCategories = ref([]);
 
-// Icon mapping for categories
 const categoryIcons = {
   'futbolki-i-majki': '👕',
   'rubashki': '👔',
@@ -167,7 +111,6 @@ const categoryIcons = {
   'kostyumy': '🤵'
 };
 
-// Placeholder class mapping
 const placeholderClasses = {
   'futbolki-i-majki': 'tshirts-placeholder',
   'rubashki': 'shirts-placeholder',
@@ -181,7 +124,6 @@ const placeholderClasses = {
   'kostyumy': 'suits-placeholder'
 };
 
-// Helper functions
 const getCategoryIcon = (slug) => {
   return categoryIcons[slug] || '👕';
 };
@@ -191,12 +133,9 @@ const getPlaceholderClass = (slug) => {
 };
 
 const getCategoryCount = (category) => {
-  // You can add product count if your API returns it
-  // return category.products_count ? `${category.products_count} товаров` : 'Новая коллекция';
   return 'Новая коллекция';
 };
 
-// Fetch boys categories on mount
 onMounted(async () => {
   try {
     loading.value = true;
@@ -216,7 +155,6 @@ onMounted(async () => {
   padding-top: 120px;
 }
 
-/* Loading state */
 .loading-container {
   text-align: center;
   padding: 3rem;
@@ -229,12 +167,10 @@ onMounted(async () => {
   color: #666;
 }
 
-/* Hero Carousel */
 .hero-carousel {
   margin-bottom: 2rem;
 }
 
-/* Sections */
 .section {
   margin: 3rem 0;
   padding: 2rem 0;
@@ -256,7 +192,6 @@ onMounted(async () => {
   text-align: center;
 }
 
-/* Categories Grid */
 .categories-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -281,7 +216,7 @@ onMounted(async () => {
 
 .category-image {
   width: 100%;
-  height: 280px; /* Increased from 180px to 280px (55% increase) */
+  height: 280px; 
   overflow: hidden;
   position: relative;
 }
@@ -329,7 +264,6 @@ onMounted(async () => {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Category Placeholders */
 .default-placeholder {
   background: linear-gradient(135deg, #9E9E9E, #616161);
 }
@@ -375,7 +309,7 @@ onMounted(async () => {
 }
 
 .category-info {
-  padding: 1rem; /* Reduced from 1.5rem to balance with larger image */
+  padding: 1rem; 
   text-align: center;
 }
 
@@ -394,7 +328,6 @@ onMounted(async () => {
   margin: 0;
 }
 
-/* Featured Collections */
 .featured-section {
   background: #f8f9fa;
   border-radius: 20px;
@@ -453,7 +386,6 @@ onMounted(async () => {
   background: linear-gradient(135deg, #212121, #424242);
 }
 
-/* Responsive Design */
 @media (max-width: 1024px) {
   .featured-grid {
     grid-template-columns: 1fr;
@@ -480,7 +412,7 @@ onMounted(async () => {
   }
   
   .category-image {
-    height: 220px; /* Adjusted for mobile - increased from 150px */
+    height: 220px; 
   }
   
   .placeholder-icon {

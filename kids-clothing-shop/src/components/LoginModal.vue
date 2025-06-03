@@ -1,5 +1,4 @@
 <template>
-  <teleport to="body">
   <div v-if="isOpen" class="modal-overlay" @click.self="closeModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -199,7 +198,6 @@
       </div>
     </div>
   </div>
-  </teleport>
 </template>
 
 <script setup>
@@ -371,7 +369,7 @@ watch(() => props.isOpen, (isOpen) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 2000;
   padding: 1rem;
 }
 
@@ -550,28 +548,6 @@ watch(() => props.isOpen, (isOpen) => {
   .modal-header,
   .modal-body {
     padding: 1rem;
-  }
-}
-</style>
-
-<style>
-@media (max-width: 480px) {
-  .modal-overlay {
-    /* Вместо "align-items: center" теперь верхнее прижатие:
-       окно начнётся ниже (за счёт padding-top), а не отцентрируется
-       в середине */
-    align-items: flex-start;
-    padding-top: 1.5rem; /* Увеличиваем отступ сверху, чтобы модалка не «упиралась» в шапку */
-  }
-
-  .modal-content {
-    /* Убираем скругление по бокам, чтобы выглядело холистично (опционально) */
-    border-radius: 8px 8px 0 0;
-    /* Задаём чуть большую максимальную высоту, чтобы влезало по вертикали,
-       но не больше viewport – padding-top */
-    max-height: calc(100vh - 2rem);
-    /* Если хочется подвинуть ближе к краям, можно уменьшить horizontal padding */
-    margin: 0 0.5rem;
   }
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <header class="header" :class="{ 'scrolled': scrolled }">
     <div class="header-content">
-      <!-- Левый блок: кнопка меню и логотип -->
+      <!-- Левый блок -->
       <div class="header-left">
         <button class="menu-button" @click="toggleMenu">
           <span class="menu-icon"></span>
@@ -11,7 +11,7 @@
         </router-link>
       </div>
       
-      <!-- Правый блок: иконки поиска, профиля, избранного и корзины -->
+      <!-- Правый блок -->
       <div class="header-actions">
         <button class="action-button" @click="toggleSearch">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon">
@@ -75,7 +75,6 @@
       </nav>
     </div>
     
-    <!-- Login Modal -->
     <LoginModal :is-open="loginModalOpen" @close="closeLoginModal" />
   </header>
 </template>
@@ -101,7 +100,6 @@ const toggleMenu = () => {
     searchOpen.value = false;
   }
   
-  // Защита от скрола при открытом меню
   if (menuOpen.value) {
     document.body.style.overflow = 'hidden';
   } else {
@@ -131,10 +129,8 @@ const setActiveCategory = (category) => {
 
 const handleUserIconClick = () => {
   if (authStore.isAuthenticated) {
-    // Если аутентифицирован, то переход на страницу профиля
     router.push('/account');
   } else {
-    // Форма аутентификации
     loginModalOpen.value = true;
   }
 };

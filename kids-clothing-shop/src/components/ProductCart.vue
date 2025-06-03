@@ -2,27 +2,24 @@
   <div class="product-card">
     <div class="product-image-container">
       <router-link :to="`/products/${product.slug}`" class="product-link">
-        <!-- Product Image -->
         <div class="product-image-wrapper">
           <img 
             :src="
               product.main_image_url || 
               product.image        || 
               product.image_url
-            "  
+            " 
             :alt="product.title" 
             class="product-image"
           >
         </div>
         
-        <!-- Product Badges -->
         <div class="product-badges">
           <span v-if="product.is_new" class="badge badge-new">NEW</span>
           <span v-if="salePercentage" class="badge badge-sale">-{{ salePercentage }}%</span>
         </div>
       </router-link>
       
-      <!-- Favorite Button -->
       <button 
         class="favorite-button"
         :class="{ 'active': isFavorite }"
@@ -47,7 +44,6 @@
       </button>
     </div>
     
-    <!-- Product Info -->
     <div class="product-info">
       <router-link :to="`/products/${product.slug}`" class="product-title">
         {{ product.title }}
@@ -88,18 +84,17 @@ const favoriteStore = useFavoriteStore();
 const authStore = useAuthStore();
 const isToggling = ref(false);
 
-// Create a reactive computed that properly tracks the store state
+// Проверка состояния избранного
 const isFavorite = computed(() => {
-  // This forces reactivity by directly checking the store's reactive array
   return favoriteStore.favoriteItems.some(item => item.id === props.product.id);
 });
 
-// Debug watcher to see when favorite status changes
+// Проверкаа изминения статуса избранного
 watch(isFavorite, (newVal, oldVal) => {
   console.log(`Product ${props.product.id} favorite status: ${oldVal} -> ${newVal}`);
 }, { immediate: true });
 
-// Watch for changes in the favorites array
+// Проверка списка избранного
 watch(() => favoriteStore.favoriteItems, (newItems) => {
   console.log('Favorites array updated:', newItems.length, 'items');
 }, { deep: true });
@@ -122,30 +117,22 @@ const salePercentage = computed(() => {
 
 const toggleFavorite = async () => {
   if (isToggling.value) return;
-  
-  console.log('=== TOGGLE FAVORITE START ===');
-  console.log('Product:', props.product.title, 'ID:', props.product.id);
-  console.log('Current status:', isFavorite.value);
-  console.log('User authenticated:', authStore.isAuthenticated);
+
   
   isToggling.value = true;
   
   try {
     await favoriteStore.toggleFavorite(props.product);
     
-    // Wait for reactivity to update
     await nextTick();
-    
-    console.log('Toggle completed. New status:', isFavorite.value);
-    console.log('Current favorites count:', favoriteStore.favoriteItems.length);
+
     
   } catch (error) {
-    console.error('Toggle favorite error:', error);
+    console.error('Ошибка:', error);
   } finally {
     isToggling.value = false;
   }
-  
-  console.log('=== TOGGLE FAVORITE END ===');
+
 };
 
 

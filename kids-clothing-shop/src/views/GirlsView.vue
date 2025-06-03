@@ -64,54 +64,6 @@
           </div>
         </div>
       </section>
-      
-      <!-- Featured Collections -->
-      <section class="section featured-section">
-        <div class="container">
-          <h2 class="section-title">ПОПУЛЯРНЫЕ КОЛЛЕКЦИИ</h2>
-          <div class="featured-grid">
-            <div class="featured-item large">
-              <router-link to="/categories/girls/dresses" class="featured-link">
-                <div class="featured-image">
-                  <div class="image-placeholder dresses-placeholder">
-                    <div class="placeholder-content">
-                      <div class="placeholder-icon">👗</div>
-                      <h3>ПЛАТЬЯ И САРАФАНЫ</h3>
-                      <p>Красивые платья для любого случая</p>
-                    </div>
-                  </div>
-                </div>
-              </router-link>
-            </div>
-            
-            <div class="featured-item">
-              <router-link to="/categories/girls/casual" class="featured-link">
-                <div class="featured-image">
-                  <div class="image-placeholder casual-placeholder">
-                    <div class="placeholder-content">
-                      <div class="placeholder-icon">👚</div>
-                      <h4>ПОВСЕДНЕВНАЯ ОДЕЖДА</h4>
-                    </div>
-                  </div>
-                </div>
-              </router-link>
-            </div>
-            
-            <div class="featured-item">
-              <router-link to="/categories/girls/party" class="featured-link">
-                <div class="featured-image">
-                  <div class="image-placeholder party-placeholder">
-                    <div class="placeholder-content">
-                      <div class="placeholder-icon">✨</div>
-                      <h4>ПРАЗДНИЧНАЯ ОДЕЖДА</h4>
-                    </div>
-                  </div>
-                </div>
-              </router-link>
-            </div>
-          </div>
-        </div>
-      </section>
     </main>
   </div>
 </template>

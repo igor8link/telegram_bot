@@ -111,8 +111,6 @@ const detailSlides = computed(() => {
 const selectColor = (colorId) => {
   if (selectedColorId.value === colorId) return;
   selectedColorId.value = colorId;
-
-  // Как только цвет поменялся, сбрасываем размер на первую опцию в новом варианте
   const variant = product.value.variants.find(v => v.color.id === colorId);
   if (variant?.stocks.length) {
     selectedSizeId.value = variant.stocks[0].size.id;

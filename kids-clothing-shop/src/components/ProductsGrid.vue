@@ -13,7 +13,6 @@
     
     <div v-else-if="products.length > 0" class="product-slider-wrapper">
       <!-- Кнопки-стрелки для ПК -->
-       <div class="container">
       <button class="slider-button left" @click="scrollLeft" aria-label="Scroll left">
         ←
       </button>
@@ -21,7 +20,6 @@
         →
       </button>
       
-      <!-- Сам слайдер -->
       <div 
         ref="slider" 
         class="product-slider" 
@@ -36,7 +34,7 @@
         />
       </div>
     </div>
-    </div>
+    
     <div v-else class="no-products">
       <p>Товары не найдены</p>
     </div>
@@ -72,7 +70,6 @@ const loading = ref(true);
 const products = ref([]);
 const slider = ref(null);
 
-// Для свайпа
 let touchStartX = 0;
 let touchEndX = 0;
 
@@ -85,14 +82,15 @@ const onTouchEnd = (e) => {
   handleSwipe();
 };
 
+// жесты 
 const handleSwipe = () => {
   const threshold = 50;
   if (!slider.value) return;
   if (touchEndX < touchStartX - threshold) {
-    // свайп влево -> листаем вправо
+    
     scrollRight();
   } else if (touchEndX > touchStartX + threshold) {
-    // свайп вправо -> листаем влево
+    
     scrollLeft();
   }
 };
@@ -143,7 +141,6 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
-  padding: 0 1rem;
 }
 
 .section-title {
@@ -182,21 +179,10 @@ onMounted(async () => {
   color: #666;
 }
 
-/* Обёртка для слайдера */
 .product-slider-wrapper {
   position: relative;
-  margin-bottom: 2rem;
 }
 
-.container {
-  max-width: 1140px;   /* или тот же max-width, что у вас в main.css */
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-
-/* Сама область прокрутки */
 .product-slider {
   display: flex;
   gap: 16px;
@@ -206,19 +192,17 @@ onMounted(async () => {
   padding-bottom: 10px; 
 }
 
-/* Скрыть скроллбар в Webkit-браузерах */
 .product-slider::-webkit-scrollbar {
   display: none;
 }
 
-/* Каждый товар внутри слайдера */
+
 .slider-item {
   flex: 0 0 auto;
   scroll-snap-align: start;
-  width: 200px; /* фиксированная ширина карточки */
+  width: 200px; 
 }
 
-/* Кнопки-стрелки */
 .slider-button {
   position: absolute;
   top: 50%;
@@ -240,17 +224,14 @@ onMounted(async () => {
   background: rgba(255, 255, 255, 1);
 }
 
-/* Левая стрелка */
 .slider-button.left {
-  left: 1rem; /* ровно “отступ .container” от левого края */
+  left: -16px;
 }
 
-/* Правая стрелка */
 .slider-button.right {
-  right: 1rem; /* ровно “отступ .container” от правого края */
+  right: -16px;
 }
 
-/* Скрываем стрелки на мобильных */
 @media (max-width: 768px) {
   .slider-button {
     display: none;
