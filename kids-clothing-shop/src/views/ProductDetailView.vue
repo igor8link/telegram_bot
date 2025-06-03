@@ -77,7 +77,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import api from '@/services/api';
 import AppHeader from '@/components/AppHeader.vue';
 import Carousel from '@/components/Carousel.vue';
@@ -85,6 +85,7 @@ import ProductsGrid from '@/components/ProductsGrid.vue';
 
 
 const route = useRoute();
+const router = useRouter();
 const slug = ref(route.params.slug);
 
 const product = ref(null);
@@ -135,15 +136,22 @@ const addToCart = async () => {
     return alert('Выбранного размера нет в наличии');
   }
 
-  try {
-    await api.addToCart({
+   try {
+    const response = await api.addToCart({
       product_stock_id: stock.id,
       quantity: 1
     });
-    alert('Товар добавлен в корзину');
+
+    console.log('addToCart успешен:', response);
+    // сразу редиректим в корзину
+    router.push('/cart');
   } catch (e) {
-    alert('Ошибка при добавлении в корзину');
-    console.error(e);
+    console.error('Ошибка при addToCart:', e);
+    if (e.response) {
+      console.error('— status:', e.response.status);
+      console.error('— data:', e.response.data);
+    }
+    alert('Ошибка при добавлении в корзину. Подробности — в консоли.');
   }
 };
 
