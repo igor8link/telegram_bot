@@ -1,85 +1,61 @@
-<!-- src/views/OrdersView.vue -->
 <template>
   <div class="orders-page">
-    <!-- Шапка сайта -->
     <AppHeader />
 
     <div class="container">
       <h1 class="page-title">Мои заказы</h1>
 
-      <!-- Если идёт загрузка: спиннер -->
-      <div v-if="loading" class="loading-container">
-        <div class="loading-spinner"></div>
+      <!-- Если всё ещё идёт загрузка -->
+      <div v-if="loading" class="orders-loading">
+        <div class="spinner"></div>
         <p>Загрузка заказов...</p>
       </div>
 
-      <!-- Если произошла ошибка при загрузке -->
-      <div v-else-if="error" class="error-container">
-        <p>{{ error }}</p>
-        <button @click="fetchOrders" class="retry-button">
-          Попробовать снова
-        </button>
-      </div>
-
-      <!-- Если заказов нет -->
-      <div v-else-if="orders.length === 0" class="empty-orders">
-        <p>У вас ещё нет заказов.</p>
-        <router-link to="/" class="continue-shopping-button">
-          Вернуться в магазин
-        </router-link>
+      <!-- Если после загрузки нет ни одного заказа -->
+      <div v-else-if="orders.length === 0" class="orders-empty">
+        <p>У вас пока нет заказов.</p>
+        <router-link to="/" class="back-to-shop">Вернуться в каталог</router-link>
       </div>
 
       <!-- Список заказов -->
       <div v-else class="orders-list">
-        <div
-          v-for="order in orders"
-          :key="order.id"
-          class="order-card"
-        >
-          <!-- Заголовок карточки заказа: номер и дата -->
+        <div v-for="order in orders" :key="order.id" class="order-card">
+          <!-- HEADER ЗАКАЗА: номер, дата, статус -->
           <div class="order-header">
-            <h2>Заказ №{{ order.id }}</h2>
-            <span class="order-date">
-              {{ formatDate(order.created_at) }}
-            </span>
-            <span class="order-status">
+            <div class="order-header-left">
+              <h2 class="order-number">Заказ №{{ order.id }}</h2>
+              <span class="order-date">{{ formatDate(order.created_at) }}</span>
+            </div>
+            <div class="order-status" :class="statusClass(order.status)">
               {{ statusLabel(order.status) }}
-            </span>
+            </div>
           </div>
 
-          <!-- Список товаров внутри заказа -->
+          <hr class="order-separator" />
+
+          <!-- ТОВАРЫ В ЗАКАЗЕ -->
           <div class="order-items">
-            <div
-              v-for="item in order.items"
-              :key="item.id"
+            <div 
+              v-for="item in order.items" 
+              :key="item.id" 
               class="order-item"
             >
-              <img
-                :src="getImageUrl(item)"
-                alt="Изображение товара"
-                class="item-image"
-              />
               <div class="item-info">
                 <p class="item-title">{{ item.product.title }}</p>
                 <p class="item-variant">
-                  Цвет: {{ item.variant.color.name }}, 
+                  Цвет: {{ item.variant.color.name }},  
                   Размер: {{ item.size.name }}
-                </p>
-              </div>
-              <div class="item-prices">
-                <p class="item-unit-price">
-                  {{ formatPrice(item.price) }} × {{ item.quantity }}
-                </p>
-                <p class="item-total-price">
-                  = <strong>{{ formatPrice(item.price * item.quantity) }}</strong>
                 </p>
               </div>
             </div>
           </div>
 
-          <!-- Итоговая сумма заказа -->
-          <div class="order-summary">
-            <p>Всего: <strong>{{ formatPrice(order.total_price) }}</strong></p>
+          <hr class="order-separator" />
+
+          <!-- ИТОГ ПО ЗАКАЗУ -->
+          <div class="order-footer">
+            <span class="order-total-label">Всего:</span>
+            <span class="order-total-price">{{ order.total_price }}</span>
           </div>
         </div>
       </div>
@@ -89,316 +65,315 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useAuthStore } from '@/stores/authStore';
-import api from '@/services/api';
+import { useRouter } from 'vue-router';
+import api from '@/services/api';       // здесь – ваш axios-инстанс или аналог
 import AppHeader from '@/components/AppHeader.vue';
 
-// Состояния компонента
-const loading = ref(false);
-const error = ref('');
+// Состояния
 const orders = ref([]);
+const loading = ref(false);
+const router = useRouter();
 
-// Если требуется проверить авторизацию, можно использовать authStore:
-// const authStore = useAuthStore();
-// onMounted(() => {
-//   if (!authStore.isAuthenticated) {
-//     router.push('/'); // или какая у вас логика редиректа
-//     return;
-//   }
-//   fetchOrders();
-// });
-
-async function fetchOrders() {
+// Загрузка списка заказов текущего юзера
+const fetchOrders = async () => {
   loading.value = true;
-  error.value = '';
   try {
+    // Предполагаем, что api.getOrders() делает GET /api/orders/
     const response = await api.getOrders();
-    // Если пришёл объект с пагинацией (есть поле `results`), берём его,
-    // иначе — считаем, что `response.data` уже просто массив.
-    if (Array.isArray(response.data)) {
-      orders.value = response.data;
-    } else if (response.data.results) {
-      orders.value = response.data.results;
-    } else {
-      orders.value = [];
+    // Ждём, что сервер вернёт { results: [...] } или просто [...], проверите у себя
+    orders.value = response.data.results || response.data;
+  } catch (err) {
+    console.error('Ошибка при загрузке заказов:', err);
+    // Если не авторизованы, редирект на логин
+    if (err.response && err.response.status === 401) {
+      router.push('/login');
     }
-  } catch (e) {
-    console.error('Ошибка загрузки заказов:', e);
-    error.value = 'Не удалось загрузить заказы. Попробуйте позже.';
   } finally {
     loading.value = false;
   }
-}
+};
 
-// При монтировании компонента загружаем заказы
-onMounted(() => {
-  fetchOrders();
-});
-
-// Помогает форматировать дату (ISO → DD.MM.YYYY HH:mm)
-function formatDate(isoString) {
-  if (!isoString) return '';
+// Вспомогательная функция форматирования даты в «ДД.ММ.ГГГГ ЧЧ:ММ»
+const formatDate = (isoString) => {
   const date = new Date(isoString);
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  return `${day}.${month}.${year} ${hours}:${minutes}`;
-}
+  const d = String(date.getDate()).padStart(2, '0');
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const y = date.getFullYear();
+  const hh = String(date.getHours()).padStart(2, '0');
+  const mm = String(date.getMinutes()).padStart(2, '0');
+  return `${d}.${m}.${y} ${hh}:${mm}`;
+};
 
-// Преобразуем статус из сериализатора в читаемую метку
-function statusLabel(code) {
-  switch (code) {
-    case 'pending': return 'Создано';
-    case 'processing': return 'В процессе';
-    case 'shipped': return 'Отправлено';
-    case 'delivered': return 'Доставлено';
-    case 'cancelled': return 'Отменено';
-    default: return code;
+// Отображаемое имя статуса (пример перевода)
+const statusLabel = (status) => {
+  switch (status) {
+    case 'pending':    return 'Создан';
+    case 'processing': return 'В обработке';
+    case 'shipped':    return 'Отправлен';
+    case 'delivered':  return 'Доставлен';
+    case 'cancelled':  return 'Отменён';
+    default:           return status;
   }
-}
-
-// Если у товара нет картинки в заказе, можно взять любую заглушку.
-function getImageUrl(item) {
-  // Предполагаем, что item.product у нас – объект продукта.
-  // Если у вас есть в API ссылка на картинку (например, в product.image),
-  // замените на корректное поле. Здесь разберём случай, что 
-  // продукт хранит хотя бы одно изображение:
-  if (item.product.image) {
-    return item.product.image;
+};
+// CSS-класс для статуса (чтобы можно было подчёркивать цветом)
+const statusClass = (status) => {
+  switch (status) {
+    case 'pending':    return 'status-pending';
+    case 'processing': return 'status-processing';
+    case 'shipped':    return 'status-shipped';
+    case 'delivered':  return 'status-delivered';
+    case 'cancelled':  return 'status-cancelled';
+    default:           return '';
   }
-  // Иначе – пустая строка или статичная заглушка:
-  return '';
-}
+};
 
-// Вспомогательная функция форматирования цены в ₽
-function formatPrice(value) {
+// Форматирование цены в рублях
+const formatPrice = (value) => {
   if (typeof value !== 'number') return '';
   return new Intl.NumberFormat('ru-RU', {
     style: 'currency',
     currency: 'RUB',
     minimumFractionDigits: 0
   }).format(value);
-}
+};
+
+onMounted(fetchOrders);
 </script>
 
 <style scoped>
-/* --- Общие отступы и фон под шапку --- */
+/* ---------- ОБЩИЕ СТИЛИ ---------- */
 .orders-page {
-  padding-top: 120px;        /* так же, как в других страницах */
+  padding-bottom: 40px;
+  background-color: var(--color-background);
   min-height: 100vh;
-  background-color: #f5f5f5; /* светло-серый фон, как в account-page */
 }
 
-/* --- Контейнер по центру (аналогично AccountView.vue / CheckoutView.vue) --- */
 .container {
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 0 16px;
 }
 
-/* Заголовок страницы */
 .page-title {
   font-size: 2rem;
   font-weight: 600;
-  margin-bottom: 1.5rem;
-  color: #333;
+  margin: 24px 0;
+  color: var(--color-text);
+  text-align: center;
 }
 
-/* Спиннер при загрузке */
-.loading-container {
+/* Состояние загрузки */
+.orders-loading {
   text-align: center;
-  padding: 3rem;
-  color: #666;
+  padding: 4rem 0;
+  color: var(--color-text-light);
 }
-.loading-spinner {
+.orders-loading .spinner {
   width: 40px;
   height: 40px;
-  margin: 0 auto 1rem;
+  margin: 0 auto 16px;
   border: 3px solid #f3f3f3;
-  border-top: 3px solid #000;
+  border-top: 3px solid var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 @keyframes spin {
-  0% { transform: rotate(0deg); }
+  0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-/* Блок ошибки */
-.error-container {
-  text-align: center;
-  padding: 3rem;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  color: #c0392b;
-}
-.retry-button {
-  margin-top: 1rem;
-  padding: 0.75rem 1.5rem;
-  background-color: #000;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: opacity 0.2s ease;
-}
-.retry-button:hover {
-  opacity: 0.9;
-}
-
 /* Пустой список заказов */
-.empty-orders {
+.orders-empty {
   text-align: center;
-  padding: 3rem;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  margin-bottom: 2rem;
+  padding: 4rem 0;
+  color: var(--color-text-light);
 }
-.empty-orders p {
-  color: #666;
-  font-size: 1rem;
-}
-.continue-shopping-button {
+.orders-empty .back-to-shop {
   display: inline-block;
-  margin-top: 1rem;
-  padding: 0.75rem 2rem;
-  background-color: #000;
-  color: #fff;
-  text-decoration: none;
+  margin-top: 16px;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
   border-radius: 4px;
+  text-decoration: none;
   font-weight: 500;
-  transition: opacity 0.2s ease;
 }
-.continue-shopping-button:hover {
+.orders-empty .back-to-shop:hover {
   opacity: 0.9;
 }
 
-/* --- Список карточек заказов --- */
+/* ---------- СТИЛИ КАРТОЧКИ ЗАКАЗА ---------- */
 .orders-list {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 24px;
 }
 
-/* Каждая карточка заказа */
 .order-card {
-  background: white;
+  background: #ffffff;
   border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-sm);
+  padding: 16px;
 }
 
-/* Шапка заказа: номер, дата и статус */
+/* Заголовок заказа: номер/дата слева + статус справа */
 .order-header {
   display: flex;
-  flex-wrap: wrap;
+  justify-content: space-between;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 12px;
 }
-.order-header h2 {
-  font-size: 1.2rem;
+
+.order-header-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.order-number {
+  font-size: 1.25rem;
   font-weight: 600;
   margin: 0;
-  color: #333;
+  color: var(--color-text);
 }
+
 .order-date {
-  font-size: 0.9rem;
-  color: #666;
+  font-size: 0.875rem;
+  color: var(--color-text-light);
+  margin-top: 4px;
 }
+
 .order-status {
-  margin-left: auto;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   font-weight: 500;
-  color: #2980b9;
+  padding: 4px 12px;
+  border-radius: 12px;
+  text-transform: uppercase;
+}
+/* Разные цвета для статусов */
+.status-pending    { background: #FFF8E1; color: #9C6B00; }
+.status-processing { background: #E3F2FD; color: #0D47A1; }
+.status-shipped    { background: #E8F5E9; color: #1B5E20; }
+.status-delivered  { background: #F1F8E9; color: #33691E; }
+.status-cancelled  { background: #FFEBEE; color: #B71C1C; }
+
+/* Разделительная линия */
+.order-separator {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 8px 0;
 }
 
 /* Блок с товарами внутри заказа */
 .order-items {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: 12px;
 }
 
+/* Каждый элемент (товар) */
 .order-item {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  border-bottom: 1px solid #eceeef;
-  padding-bottom: 0.75rem;
-}
-.order-item:last-child {
-  border-bottom: none;
+  gap: 12px;
 }
 
+/* Изображение товара */
 .item-image {
-  width: 60px;
-  height: 60px;
-  object-fit: cover;
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  border: 1px solid var(--color-border);
   border-radius: 4px;
+  overflow: hidden;
+  background-color: #f9f9f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+.item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.item-image .no-image {
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Информация о товаре: название + вариант */
 .item-info {
   flex: 1;
-}
-.item-title {
-  font-weight: 500;
-  margin: 0 0 0.25rem 0;
-  color: #333;
-}
-.item-variant {
-  margin: 0;
-  font-size: 0.875rem;
-  color: #555;
-}
-
-/* Цены для каждой позиции */
-.item-prices {
-  text-align: right;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  justify-content: center;
 }
-.item-unit-price,
-.item-total-price {
-  margin: 0;
-  font-size: 0.9rem;
-  color: #333;
-}
-
-/* Итоговая сумма заказа */
-.order-summary {
-  text-align: right;
+.item-title {
   font-size: 1rem;
-  font-weight: 600;
-  color: #333;
+  font-weight: 500;
+  margin: 0 0 4px;
+  color: var(--color-text);
+}
+.item-variant {
+  font-size: 0.875rem;
+  color: var(--color-text-light);
+  margin: 0;
 }
 
-/* --- Адаптив для мобильных --- */
+/* Количество × цена */
+.item-qty-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+.item-qty {
+  font-size: 0.875rem;
+  color: var(--color-text-light);
+  margin: 0;
+}
+.item-price {
+  font-size: 0.875rem;
+  margin: 0;
+  color: var(--color-text);
+}
+.item-price strong {
+  font-weight: 600;
+}
+
+/* Футер заказа: общий итог */
+.order-footer {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+.order-total-label {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+.order-total-price {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* ---------- АДАПТИВ ---------- */
 @media (max-width: 768px) {
-  .container {
-    padding: 1rem;
-  }
-  .order-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .order-status {
-    margin-left: 0;
-    margin-top: 0.5rem;
-  }
   .order-item {
     flex-direction: column;
     align-items: flex-start;
+    gap: 8px;
   }
-  .item-prices {
-    width: 100%;
-    text-align: right;
+  .item-qty-price {
+    align-items: flex-start;
+  }
+  .order-footer {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 </style>
