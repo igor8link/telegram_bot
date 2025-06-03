@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '@/stores/authStore';
 import HomeView from '@/views/HomeView.vue';
+import OrdersView from '@/views/OrdersView.vue';
 import { useCartStore } from '@/stores/cartStore';
 
 const routes = [
@@ -41,13 +42,6 @@ const routes = [
     meta: { title: 'Корзина' }
   },
   // {
-  //   path: '/search',
-  //   name: 'search',
-  //   component: () => import('@/views/SearchView.vue'),
-  //   meta: { title: 'Поиск' }
-  // },
-  // // Error pages
-  // {
   //   path: '/categories/:gender/:slug',
   //   name: 'category',
   //   component: () => import('@/views/CategoryDetailView.vue'),
@@ -85,6 +79,12 @@ const routes = [
     name: 'search',
     component: () => import('@/views/SearchView.vue'),
     meta: { title: 'Поиск' }
+  },
+  {
+    path: '/orders',
+    name: 'orders',
+    component: OrdersView,
+    meta: { requiresAuth: true } 
   },
   // // Error pages
   // {
