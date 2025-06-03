@@ -13,6 +13,7 @@
     
     <div v-else-if="products.length > 0" class="product-slider-wrapper">
       <!-- Кнопки-стрелки для ПК -->
+       <div class="container">
       <button class="slider-button left" @click="scrollLeft" aria-label="Scroll left">
         ←
       </button>
@@ -35,7 +36,7 @@
         />
       </div>
     </div>
-    
+    </div>
     <div v-else class="no-products">
       <p>Товары не найдены</p>
     </div>
@@ -142,6 +143,7 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  padding: 0 1rem;
 }
 
 .section-title {
@@ -183,6 +185,15 @@ onMounted(async () => {
 /* Обёртка для слайдера */
 .product-slider-wrapper {
   position: relative;
+  margin-bottom: 2rem;
+}
+
+.container {
+  max-width: 1140px;   /* или тот же max-width, что у вас в main.css */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 /* Сама область прокрутки */
@@ -192,7 +203,7 @@ onMounted(async () => {
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 10px; /* место для скруглённого контента */
+  padding-bottom: 10px; 
 }
 
 /* Скрыть скроллбар в Webkit-браузерах */
@@ -231,12 +242,12 @@ onMounted(async () => {
 
 /* Левая стрелка */
 .slider-button.left {
-  left: -16px;
+  left: 1rem; /* ровно “отступ .container” от левого края */
 }
 
 /* Правая стрелка */
 .slider-button.right {
-  right: -16px;
+  right: 1rem; /* ровно “отступ .container” от правого края */
 }
 
 /* Скрываем стрелки на мобильных */

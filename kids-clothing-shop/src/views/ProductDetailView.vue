@@ -63,6 +63,16 @@
       </div>
     </div>
   </div>
+  <section class="section">
+        <div class="container">
+          <ProductsGrid 
+            title="ТОП ПРОДАЖ"
+            :limit="8"
+            view-all-link="/products/new"
+            gender="boys"
+          />
+        </div>
+      </section>
 </template>
 
 <script setup>
@@ -71,6 +81,7 @@ import { useRoute } from 'vue-router';
 import api from '@/services/api';
 import AppHeader from '@/components/AppHeader.vue';
 import Carousel from '@/components/Carousel.vue';
+import ProductsGrid from '@/components/ProductsGrid.vue';
 
 
 const route = useRoute();
@@ -221,14 +232,34 @@ watch(
   gap: 10px;
 }
 
-/* Базовый стиль для каждой кнопки-опции */
+.section {
+  margin: 3rem 0;
+  padding: 2rem 0;
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #000;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
 .option-button {
   min-width: 48px;
   height: 48px;
   padding: 0 12px;
   border: none;
-  border-radius: 24px; /* делает круглую кнопку */
-  background-color: #f0f0f0; /* светло-серый фон */
+  border-radius: 24px; 
+  background-color: #f0f0f0; 
   color: #333;
   font-size: 0.9rem;
   font-weight: 500;
@@ -239,21 +270,21 @@ watch(
   justify-content: center;
 }
 
-/* Ховер-эффект для неактивных кнопок */
+
 .option-button:hover {
   background-color: #e0e0e0;
 }
 
-/* Активная (выбранная) кнопка */
+
 .option-button.active {
-  background-color: #000; /* чёрный фон */
-  color: #fff;            /* белый текст */
+  background-color: #000; 
+  color: #fff;            
 }
 
-/* Сбросить margin на кнопках, если они остаются Too Small */
+
 .option-button:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2); /* лёгкая обводка */
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2); 
 }
 .add-to-cart {
   padding: 10px 16px;

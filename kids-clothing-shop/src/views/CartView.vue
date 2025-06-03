@@ -26,7 +26,7 @@
       <!-- Пустая корзина -->
       <div v-else-if="cartItems.length === 0" class="empty-cart">
         <div class="empty-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 3h2l.4 2M7 13h10l4-8H5.4"/>
             <circle cx="7" cy="21" r="2"/>
             <circle cx="17" cy="21" r="2"/>
