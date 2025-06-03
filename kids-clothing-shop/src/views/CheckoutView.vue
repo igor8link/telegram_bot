@@ -7,13 +7,12 @@
 
       <div v-if="cartItems.length === 0" class="empty-cart">
         <p>
-          Ваша корзина пуста. 
+          Ваша корзина пуста.
           <router-link to="/cart" class="link-underlined">Перейти в корзину</router-link>
         </p>
       </div>
 
       <div v-else class="checkout-content">
-        <!-- БЛОК ФОРМЫ ЗАКАЗА -->
         <div class="section-block">
           <h2 class="section-header">Ваши данные</h2>
           <form @submit.prevent="submitOrder" class="checkout-form">
@@ -79,7 +78,6 @@
           </form>
         </div>
 
-        <!-- БЛОК ИТОГОВ ЗАКАЗА -->
         <div class="section-block">
           <h2 class="section-header">Ваш заказ</h2>
           <div class="order-summary">
@@ -90,10 +88,13 @@
             >
               <div class="summary-info">
                 <img
+                  v-if="item.product_info.image"
                   :src="item.product_info.image"
                   alt="Изображение товара"
                   class="summary-image"
                 />
+                <div v-else class="no-thumb">Нет изображения</div>
+
                 <div class="summary-text">
                   <p class="product-title">{{ item.product_info.title }}</p>
                   <p class="product-variant">
@@ -119,7 +120,6 @@
         </div>
       </div>
 
-      <!-- СОБЩЕНИЕ ОБ УСПЕШНОМ ЗАКАЗЕ -->
       <div v-if="orderSuccess" class="success-message">
         <h2>Спасибо за ваш заказ!</h2>
         <p>Ваш заказ №{{ createdOrderId }} успешно создан.</p>
@@ -130,34 +130,41 @@
   </div>
 </template>
 
+
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCartStore } from '@/stores/cartStore';
+import { useAuthStore } from '@/stores/authStore';
 import api from '@/services/api';
 import AppHeader from '@/components/AppHeader.vue';
 
-const form = ref({
+const router     = useRouter();
+const cartStore  = useCartStore();
+const authStore  = useAuthStore();
+
+const form       = ref({
   full_name: '',
   email: '',
   phone: '',
   address: ''
 });
 
-const error = ref('');
+const error      = ref('');
 const submitting = ref(false);
-const orderSuccess = ref(false);
+const orderSuccess   = ref(false);
 const createdOrderId = ref(null);
-
-const cartStore = useCartStore();
-const router = useRouter();
-
-onMounted(async () => {
-  await cartStore.loadCart();
-});
 
 const cartItems = computed(() => cartStore.items);
 const formattedTotalPrice = computed(() => formatPrice(cartStore.totalPrice));
+
+const statusLabels = {
+  pending:    'Создан',
+  processing: 'В процессе',
+  shipped:    'Отправлен',
+  delivered:  'Доставлен',
+  cancelled:  'Отменён'
+};
 
 function formatPrice(value) {
   return new Intl.NumberFormat('ru-RU', {
@@ -167,8 +174,59 @@ function formatPrice(value) {
   }).format(value);
 }
 
+function formatDate(isoString) {
+  const d  = new Date(isoString);
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  const hh = String(d.getHours()).padStart(2, '0');
+  const min= String(d.getMinutes()).padStart(2, '0');
+  return `${dd}.${mm}.${yyyy} ${hh}:${min}`;
+}
+
+const initializeFormFromProfile = () => {
+  const profile = authStore.userProfile;
+  if (!profile) {
+    form.value.full_name = '';
+    form.value.email     = '';
+    form.value.phone     = '';
+    form.value.address   = '';
+    return;
+  }
+
+  const firstName = profile.first_name || profile.user?.first_name || '';
+  const lastName  = profile.last_name  || profile.user?.last_name  || '';
+  const fullName  = [firstName, lastName].filter(s => !!s).join(' ').trim();
+
+  form.value.full_name = fullName;
+  form.value.email     = profile.user?.email || profile.email || '';
+  form.value.phone     = profile.phone_number || '';
+  form.value.address   = profile.address || '';
+};
+
+onMounted(async () => {
+  if (authStore.isAuthenticated && !authStore.userProfile) {
+    await authStore.fetchUserProfile();
+  }
+
+  initializeFormFromProfile();
+
+  await cartStore.loadCart();
+});
+
+watch(
+  () => authStore.userProfile,
+  (newProfile) => {
+    if (newProfile) {
+      initializeFormFromProfile();
+    }
+  }
+);
+
 async function submitOrder() {
   error.value = '';
+
+  // Валидация
   if (
     !form.value.full_name ||
     !form.value.email ||
@@ -180,20 +238,24 @@ async function submitOrder() {
   }
 
   submitting.value = true;
+
   try {
     const orderPayload = {
       full_name: form.value.full_name,
-      email: form.value.email,
-      phone: form.value.phone,
-      address: form.value.address
+      email:     form.value.email,
+      phone:     form.value.phone,
+      address:   form.value.address
     };
 
     const response = await api.createOrder(orderPayload);
+
     createdOrderId.value = response.data.id;
-    orderSuccess.value = true;
+    orderSuccess.value   = true;
+
+    // После успешного заказа очищаем корзину 
     cartStore.clearCart();
   } catch (e) {
-    if (e.response && e.response.data && e.response.data.error) {
+    if (e.response?.data?.error) {
       error.value = e.response.data.error;
     } else {
       error.value = 'Не удалось создать заказ. Попробуйте ещё раз.';
@@ -205,22 +267,20 @@ async function submitOrder() {
 }
 </script>
 
+
 <style scoped>
-/* --- Общая обёртка и отступ под шапку --- */
 .checkout-page {
-  padding-top: 120px;        /* точно так же, как в account-page */
+  padding-top: 120px;        
   min-height: 100vh;
-  background-color: #f5f5f5; /* светло-серый фон */
+  background-color: #f5f5f5; 
 }
 
-/* --- Контейнер по центру --- */
 .container {
-  max-width: 1200px;  /* как в account-page */
+  max-width: 1200px;  
   margin: 0 auto;
   padding: 2rem 1rem;
 }
 
-/* Заголовок страницы */
 .page-title {
   font-size: 2rem;
   font-weight: 600;
@@ -228,7 +288,6 @@ async function submitOrder() {
   color: #333;
 }
 
-/* Сообщение об пустой корзине */
 .empty-cart {
   text-align: center;
   padding: 3rem;
@@ -247,7 +306,6 @@ async function submitOrder() {
   margin-left: 4px;
 }
 
-/* --- Общий класс для блоков (как в account-section) --- */
 .section-block {
   background: white;
   padding: 1.5rem;
@@ -256,7 +314,6 @@ async function submitOrder() {
   margin-bottom: 2rem;
 }
 
-/* Заголовки внутри блоков */
 .section-header {
   font-size: 1.25rem;
   font-weight: 600;
@@ -264,7 +321,6 @@ async function submitOrder() {
   color: #333;
 }
 
-/* --- Стили формы --- */
 .checkout-form {
   display: flex;
   flex-direction: column;
@@ -309,36 +365,35 @@ async function submitOrder() {
   margin-bottom: 0.5rem;
 }
 
-/* Кнопка «Подтвердить заказ» */
 .submit-button {
-  background-color: #000;
-  color: #fff;
-  border: none;
-  padding: 1rem;
-  border-radius: 50px;
-  font-size: 1rem;
-  font-weight: 500;
+  display: inline-block;
+  background-color: #000;        
+  color: #fff;                   
+  border: none;                  
+  border-radius: 24px;           
+  padding: 10px 24px;            
+  font-size: 1rem;               
+  font-weight: 500;              
+  text-align: center;
   cursor: pointer;
-  transition: opacity 0.2s ease;
-  margin-top: 1rem;
-  align-self: flex-start;
-}
-.submit-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-.submit-button:hover:not(:disabled) {
-  opacity: 0.9;
+  transition: background-color 0.2s ease;
 }
 
-/* --- Стили итогового блока (order-summary) --- */
+.submit-button:hover {
+  background-color: #333;        
+}
+
+.submit-button:disabled {
+  background-color: #777;        
+  cursor: not-allowed;
+}
+
 .order-summary {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-/* Каждый товар в сводке */
 .summary-item {
   display: flex;
   justify-content: space-between;
@@ -398,7 +453,6 @@ async function submitOrder() {
   color: #333;
 }
 
-/* --- Сообщение об успешном заказе --- */
 .success-message {
   text-align: center;
   margin-top: 2rem;
@@ -426,7 +480,6 @@ async function submitOrder() {
   background: #1c5980;
 }
 
-/* --- Адаптивные правила (как в account-page) --- */
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
