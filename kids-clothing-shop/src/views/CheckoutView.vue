@@ -120,11 +120,18 @@
         </div>
       </div>
 
-      <div v-if="orderSuccess" class="success-message">
-        <h2>Спасибо за ваш заказ!</h2>
-        <p>Ваш заказ №{{ createdOrderId }} успешно создан.</p>
-        <router-link to="/" class="button-link">Вернуться на главную</router-link>
-        <router-link to="/orders" class="button-link">Мои заказы</router-link>
+      <div 
+        v-if="orderSuccess" 
+        class="section-block order-success-block mx-auto"
+      >
+        <h2 class="section-header">Спасибо за ваш заказ!</h2>
+        <p class="order-success-text">
+          Ваш заказ №<strong>{{ createdOrderId }}</strong> успешно создан.
+        </p>
+        <div class="order-success-buttons text-center">
+          <router-link to="/" class="button-link">Вернуться на главную</router-link>
+          <router-link to="/orders" class="button-link">Мои заказы</router-link>
+        </div>
       </div>
     </div>
   </div>
@@ -453,18 +460,25 @@ async function submitOrder() {
   color: #333;
 }
 
-.success-message {
-  text-align: center;
-  margin-top: 2rem;
+.order-success-block {
+  max-width: 600px;
+  margin: 2rem auto 0;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-.success-message h2 {
-  color: #27ae60;
-  margin-bottom: 0.5rem;
-}
-.success-message p {
+
+.order-success-text {
   margin-bottom: 1.5rem;
   color: #333;
+  font-size: 1rem;
 }
+
+.order-success-buttons .button-link {
+  margin: 0 0.5rem;
+}
+
 .button-link {
   display: inline-block;
   margin: 0 0.5rem;
