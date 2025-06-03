@@ -1,13 +1,11 @@
 <template>
   <div class="product-detail" v-if="product">
-    <div class="carousel-container">
-      <div v-if="currentImages.length" class="carousel">
-        <img :src="currentImages[currentImageIndex]?.image_url" :alt="product.title" />
-        <div class="carousel-controls">
-          <button @click="prevImage">‹</button>
-          <button @click="nextImage">›</button>
-        </div>
-      </div>
+    <div class="carousel-wrapper">
+      <Carousel 
+       :slides="detailSlides" 
+       :autoplay="true" 
+       :interval="5000" 
+     />
     </div>
 
     <div class="details">
@@ -17,31 +15,37 @@
         <span :class="{ old: product.sale_price }">{{ product.price }} ₽</span>
       </p>
 
-      <div class="selector">
-        <label>Цвет:</label>
-        <select v-model.number="selectedColorId" @change="onColorChange">
-          <option 
-            v-for="variant in product.variants" 
-            :key="variant.id" 
-            :value="variant.color.id"
-          >
-            {{ variant.color.name }}
-          </option>
-        </select>
-      </div>
+      <div class="selector-buttons">
+  <label>Цвет:</label>
+  <div class="buttons-row">
+    <button
+      v-for="variant in product.variants"
+      :key="variant.id"
+      type="button"
+      class="option-button"
+      :class="{ active: variant.color.id === selectedColorId }"
+      @click="selectColor(variant.color.id)"
+    >
+      {{ variant.color.name }}
+    </button>
+  </div>
+</div>
 
-      <div class="selector">
-        <label>Размер:</label>
-        <select v-model.number="selectedSizeId">
-          <option 
-            v-for="size in availableSizes" 
-            :key="size.id" 
-            :value="size.size.id"
-          >
-            {{ size.size.name }}
-          </option>
-        </select>
-      </div>
+<div class="selector-buttons">
+  <label>Размер:</label>
+  <div class="buttons-row">
+    <button
+      v-for="stock in availableSizes"
+      :key="stock.id"
+      type="button"
+      class="option-button"
+      :class="{ active: stock.size.id === selectedSizeId }"
+      @click="selectSize(stock.size.id)"
+    >
+      {{ stock.size.name }}
+    </button>
+  </div>
+</div>
 
       <button class="add-to-cart" @click="addToCart">Добавить в корзину</button>
 
@@ -64,6 +68,8 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import api from '@/services/api';
+import Carousel from '@/components/Carousel.vue';
+
 
 const route = useRoute();
 const slug = ref(route.params.slug);
@@ -81,23 +87,29 @@ const currentVariant = computed(() =>
 const currentImages = computed(() => currentVariant.value?.images || []);
 const availableSizes = computed(() => currentVariant.value?.stocks || []);
 
-const nextImage = () => {
-  if (!currentImages.value.length) return;
-  currentImageIndex.value = (currentImageIndex.value + 1) % currentImages.value.length;
-};
+const detailSlides = computed(() => {
+  return currentImages.value.map(img => ({
+    id: img.id,
+    image: img.image_url,
+    alt: product.value.title
+  }))
+})
 
-const prevImage = () => {
-  if (!currentImages.value.length) return;
-  currentImageIndex.value =
-    (currentImageIndex.value - 1 + currentImages.value.length) % currentImages.value.length;
-};
+const selectColor = (colorId) => {
+  if (selectedColorId.value === colorId) return;
+  selectedColorId.value = colorId;
 
-const onColorChange = () => {
-  const variant = product.value?.variants.find(v => v.color.id === selectedColorId.value);
+  // Как только цвет поменялся, сбрасываем размер на первую опцию в новом варианте
+  const variant = product.value.variants.find(v => v.color.id === colorId);
   if (variant?.stocks.length) {
     selectedSizeId.value = variant.stocks[0].size.id;
+  } else {
+    selectedSizeId.value = null;
   }
-  currentImageIndex.value = 0;
+};
+
+const selectSize = (sizeId) => {
+  selectedSizeId.value = sizeId;
 };
 
 const addToCart = async () => {
@@ -158,30 +170,9 @@ watch(
   gap: 20px;
   padding: 20px;
 }
-.carousel-container {
+.carousel-wrapper {
   flex: 1 1 45%;
   max-width: 500px;
-}
-.carousel {
-  position: relative;
-}
-.carousel img {
-  width: 100%;
-  border-radius: 8px;
-}
-.carousel-controls {
-  position: absolute;
-  top: 45%;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-between;
-}
-.carousel-controls button {
-  background: rgba(255, 255, 255, 0.7);
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
 }
 .details {
   flex: 1 1 50%;
@@ -207,20 +198,57 @@ watch(
   text-decoration: line-through;
   color: grey;
 }
-.selector {
+.selector-buttons {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
   margin-bottom: 1rem;
 }
-.selector label {
+
+.selector-buttons label {
   font-weight: 500;
   color: #555;
 }
-.selector select {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+
+.buttons-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Базовый стиль для каждой кнопки-опции */
+.option-button {
+  min-width: 48px;
+  height: 48px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 24px; /* делает круглую кнопку */
+  background-color: #f0f0f0; /* светло-серый фон */
+  color: #333;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ховер-эффект для неактивных кнопок */
+.option-button:hover {
+  background-color: #e0e0e0;
+}
+
+/* Активная (выбранная) кнопка */
+.option-button.active {
+  background-color: #000; /* чёрный фон */
+  color: #fff;            /* белый текст */
+}
+
+/* Сбросить margin на кнопках, если они остаются Too Small */
+.option-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2); /* лёгкая обводка */
 }
 .add-to-cart {
   padding: 10px 16px;
