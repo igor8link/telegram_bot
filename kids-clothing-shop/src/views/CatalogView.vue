@@ -1,60 +1,38 @@
 <template>
   <div class="catalog-page container mx-auto py-6">
-    <!-- Заголовок страницы -->
+    <!-- Заголовок -->
     <h1 class="text-2xl font-semibold mb-4">Каталог</h1>
 
-    <!-- 1. Блок фильтров -->
-    <div class="filters mb-6 flex flex-wrap gap-4">
-      <!-- 1.1. Фильтр по полу -->
-      <div class="filter-gender flex items-center gap-2">
-        <button
-          @click="applyGenderFilter(null)"
-          :class="['px-3 py-1 rounded', selectedGender === null ? 'bg-black text-white' : 'bg-gray-200']"
-        >
-          Все
-        </button>
-        <button
-          @click="applyGenderFilter('B')"
-          :class="['px-3 py-1 rounded', selectedGender === 'B' ? 'bg-black text-white' : 'bg-gray-200']"
-        >
-          Мальчики
-        </button>
-        <button
-          @click="applyGenderFilter('G')"
-          :class="['px-3 py-1 rounded', selectedGender === 'G' ? 'bg-black text-white' : 'bg-gray-200']"
-        >
-          Девочки
-        </button>
-      </div>
+    <!-- Компонент выбора категорий -->
+    <CategoriesBar
+      v-model="selectedCategoryId"
+      @select-category="onCategorySelected"
+    />
 
-      <!-- 1.2. Фильтр по категориям -->
-      <div class="filter-categories">
-        <label for="category-select" class="block text-sm font-medium mb-1">Категория:</label>
-        <select
-          id="category-select"
-          v-model="selectedCategoryId"
-          @change="applyCategoryFilter"
-          class="border rounded px-2 py-1"
-        >
-          <!-- Всегда можем выбрать "все категории" -->
-          <option :value="null">Все категории</option>
-          <!-- Отрисовываем только если categories — массив -->
-          <template v-if="Array.isArray(categories)">
-            <option
-              v-for="cat in categories"
-              :key="cat.id"
-              :value="cat.id"
-            >
-              {{ cat.name }}
-            </option>
-          </template>
-        </select>
-      </div>
+    <!-- Фильтр по полу (если нужен) -->
+    <div class="filter-gender mb-6 flex items-center gap-2">
+      <button
+        @click="applyGenderFilter(null)"
+        :class="['px-3 py-1 rounded', selectedGender === null ? 'bg-black text-white' : 'bg-gray-200']"
+      >
+        Все
+      </button>
+      <button
+        @click="applyGenderFilter('B')"
+        :class="['px-3 py-1 rounded', selectedGender === 'B' ? 'bg-black text-white' : 'bg-gray-200']"
+      >
+        Мальчики
+      </button>
+      <button
+        @click="applyGenderFilter('G')"
+        :class="['px-3 py-1 rounded', selectedGender === 'G' ? 'bg-black text-white' : 'bg-gray-200']"
+      >
+        Девочки
+      </button>
     </div>
 
-    <!-- 2. Список товаров -->
+    <!-- Сетка товаров -->
     <div class="products-grid grid gap-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-      <!-- Если products — это массив, то рисуем карточки -->
       <template v-if="Array.isArray(products)">
         <ProductCard
           v-for="product in products"
@@ -64,12 +42,12 @@
       </template>
     </div>
 
-    <!-- 3. Сообщение, если товаров нет -->
+    <!-- Если нет товаров -->
     <div v-if="!loading && Array.isArray(products) && products.length === 0" class="text-center mt-8 text-gray-500">
       Нет товаров, соответствующих выбранным фильтрам.
     </div>
 
-    <!-- 4. Индикатор загрузки -->
+    <!-- Индикатор загрузки -->
     <div v-if="loading" class="text-center mt-8">
       <span>Загрузка...</span>
     </div>
@@ -77,48 +55,26 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import api from '@/services/api';           // ваш файл api.js (с методами getProducts, getBoysProducts и т.д.)
+import { ref, onMounted } from 'vue';
+import api from '@/services/api';           // ваш api.js
 import ProductCard from '@/components/ProductCart.vue';
+import CategoriesBar from '@/components/CategoriesBar.vue';
 
-// 1. Инициализируем реактивные переменные пустыми массивами / примитивами
+// 1. Состояние страницы
 const products = ref([]);
-const categories = ref([]);
 const selectedGender = ref(null);
 const selectedCategoryId = ref(null);
 const loading = ref(false);
 
-// 2. Загружаем все категории (учитываем, что DRF возвращает { count, next, previous, results: [...] })
-const fetchAllCategories = async () => {
-  try {
-    const response = await api.getCategories();
-    // Если сервер вернул пагинированный список, data.results — это массив категорий
-    const data = response.data;
-    if (Array.isArray(data.results)) {
-      categories.value = data.results;
-    } else if (Array.isArray(data)) {
-      // на случай, если пагинация отключена и просто возвращается чистый массив
-      categories.value = data;
-    } else {
-      categories.value = [];
-    }
-  } catch (err) {
-    console.error('Ошибка при получении категорий:', err);
-    categories.value = []; // Чтобы никогда не получить null
-  }
-};
-
-// 3. Загружаем товары с учётом фильтров
+// 2. Загрузка товаров с фильтрами
 const fetchProducts = async () => {
   loading.value = true;
-
   try {
     let response;
     const params = {};
     if (selectedCategoryId.value !== null) {
       params.categories = selectedCategoryId.value;
     }
-
     if (selectedGender.value === 'B') {
       response = await api.getBoysProducts(params);
     } else if (selectedGender.value === 'G') {
@@ -127,45 +83,37 @@ const fetchProducts = async () => {
       response = await api.getProducts(params);
     }
 
-    // DRF по умолчанию отдает { count, next, previous, results: [...] }
     const data = response.data;
     if (Array.isArray(data.results)) {
       products.value = data.results;
     } else if (Array.isArray(data)) {
-      // если пагинация отключена и сразу вернулся массив
       products.value = data;
     } else {
       products.value = [];
     }
   } catch (err) {
-    console.error('Ошибка при получении продуктов:', err);
-    products.value = []; // Чтобы никогда не получить null
+    console.error('Ошибка при получении товаров:', err);
+    products.value = [];
   } finally {
     loading.value = false;
   }
 };
 
-// 4. Обработчики фильтров
+// 3. Обработчик фильтра по полу
 const applyGenderFilter = (gender) => {
   selectedGender.value = (selectedGender.value === gender ? null : gender);
   fetchProducts();
 };
 
-const applyCategoryFilter = () => {
-  // Этот метод сработает каждый раз, когда меняется selectedCategoryId,
-  // но т. к. ниже есть watch(selectedCategoryId), дополнительный вызов fetchProducts() не нужен.
+// 4. Обработчик события из CategoriesBar
+const onCategorySelected = (catId) => {
+  // catId может быть либо null (открыть все), либо число (конкретная категория)
+  selectedCategoryId.value = catId;
+  fetchProducts();
 };
 
-// 5. onMounted: сразу подтягиваем категории и товары
-onMounted(async () => {
-  await fetchAllCategories();
-  await fetchProducts();
-});
-
-// 6. При изменении категории будем автоматически подгружать новый список
-watch(selectedCategoryId, () => {
-  fetchProducts();
-});
+// 5. При монтировании подгружаем сразу товары для «Всех»
+onMounted(fetchProducts);
 </script>
 
 <style scoped>
@@ -174,15 +122,7 @@ watch(selectedCategoryId, () => {
   padding-right: 1rem;
 }
 
-.filters {
-  align-items: center;
-}
-
 .filter-gender button {
-  cursor: pointer;
-}
-
-.filter-categories select {
   cursor: pointer;
 }
 </style>
