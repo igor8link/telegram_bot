@@ -3,10 +3,7 @@
     <AppHeader />
 
     <div class="container">
-      <!-- Заголовок -->
       <h1 class="page-title">Каталог</h1>
-
-      <!-- Фильтр по полу (перенесён выше CategoriesBar) -->
       <div class="filter-gender section-block">
         <button
           @click="applyGenderFilter(null)"
@@ -28,7 +25,6 @@
         </button>
       </div>
 
-      <!-- Компонент выбора категорий -->
       <div class="section-block">
         <CategoriesBar
           v-model="selectedCategoryId"
@@ -36,7 +32,6 @@
         />
       </div>
 
-      <!-- Сетка товаров -->
       <div class="section-block">
         <div v-if="loading" class="loading-container">
           <span>Загрузка товаров...</span>
@@ -81,56 +76,36 @@ const loading = ref(false);
 const fetchProducts = async () => {
   loading.value = true;
   try {
+    let response;
     const params = {};
     if (selectedCategoryId.value !== null) {
       params.categories = selectedCategoryId.value;
     }
-    // Если ваш бэк умеет «gender=B/G» в getProducts:
     if (selectedGender.value === 'B') {
-      params.gender = 'B';
+      response = await api.getBoysProducts(params);
     } else if (selectedGender.value === 'G') {
-      params.gender = 'G';
-    }
-
-    // Единый вызов:
-    const response = await api.getProducts(params);
-    const data = response.data;
-
-    if (Array.isArray(data.results)) {
-      products.value = data.results;
-    } else if (Array.isArray(data)) {
-      products.value = data;
+      response = await api.getGirlsProducts(params);
     } else {
-      products.value = [];
+      response = await api.getProducts(params);
     }
 
-    // Если бэкенд НЕ поддерживает параметр gender в getProducts,
-    // тогда вместо этого используйте клиентскую фильтрацию:
-    //
-    // let list = Array.isArray(data.results) ? data.results : data;
-    // if (selectedGender.value === 'B') {
-    //   products.value = list.filter(item => item.gender === 'B');
-    // } else if (selectedGender.value === 'G') {
-    //   products.value = list.filter(item => item.gender === 'G');
-    // } else {
-    //   products.value = list;
-    // }
+    const data = response.data;
+    products.value = Array.isArray(data.results) ? data.results : Array.isArray(data) ? data : [];
   } catch (err) {
-    console.error('Ошибка при получении товаров:', err);
+    console.error(err);
     products.value = [];
   } finally {
     loading.value = false;
   }
 };
 
+
 const applyGenderFilter = (gender) => {
-  // Если повторный клик по той же кнопке — сброс
   selectedGender.value = (selectedGender.value === gender ? null : gender);
   fetchProducts();
 };
 
 const onCategorySelected = (catId) => {
-  // catId = null (все категории) или конкретный ID
   selectedCategoryId.value = catId;
   fetchProducts();
 };
@@ -139,21 +114,19 @@ onMounted(fetchProducts);
 </script>
 
 <style scoped>
-/* Обёртка всей страницы: нужен отступ, чтобы контент не подлезал под AppHeader */
 .catalog-page {
-  padding-top: 88px; /* высота шапки AppHeader */
+  padding-top: 88px; 
+  margin-top: 88px;
   background-color: #f5f5f5;
   min-height: 100vh;
 }
 
-/* Контейнер, аналогично другим страницам */
 .container {
   max-width: 1280px;
   margin: 0 auto;
   padding: 20px 16px;
 }
 
-/* Заголовок страницы */
 .page-title {
   font-size: 2rem;
   font-weight: 600;
@@ -161,19 +134,16 @@ onMounted(fetchProducts);
   color: #222;
 }
 
-/* Блок секции (отступ снизу) */
 .section-block {
   margin-bottom: 1.5rem;
 }
 
-/* Фильтр по полу */
 .filter-gender {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
 }
 
-/* Кнопки фильтра */
 .filter-button {
   padding: 8px 16px;
   background-color: #f0f0f0;
@@ -195,14 +165,12 @@ onMounted(fetchProducts);
   color: #fff;
 }
 
-/* Сетка товаров */
 .products-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 16px;
 }
 
-/* Сообщение, когда товаров нет */
 .empty-message {
   text-align: center;
   color: #666;
@@ -210,7 +178,6 @@ onMounted(fetchProducts);
   font-size: 1rem;
 }
 
-/* Индикатор загрузки */
 .loading-container {
   text-align: center;
   color: #666;
