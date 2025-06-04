@@ -1,89 +1,101 @@
 <template>
-  <div class="catalog-page container mx-auto py-6">
-    <!-- Заголовок -->
-    <h1 class="text-2xl font-semibold mb-4">Каталог</h1>
+  <div class="catalog-page">
+    <AppHeader />
 
-    <!-- Компонент выбора категорий -->
-    <CategoriesBar
-      v-model="selectedCategoryId"
-      @select-category="onCategorySelected"
-    />
+    <div class="container">
+      <!-- Заголовок -->
+      <h1 class="page-title">Каталог</h1>
 
-    <!-- Фильтр по полу (если нужен) -->
-    <div class="filter-gender mb-6 flex items-center gap-2">
-      <button
-        @click="applyGenderFilter(null)"
-        :class="['px-3 py-1 rounded', selectedGender === null ? 'bg-black text-white' : 'bg-gray-200']"
-      >
-        Все
-      </button>
-      <button
-        @click="applyGenderFilter('B')"
-        :class="['px-3 py-1 rounded', selectedGender === 'B' ? 'bg-black text-white' : 'bg-gray-200']"
-      >
-        Мальчики
-      </button>
-      <button
-        @click="applyGenderFilter('G')"
-        :class="['px-3 py-1 rounded', selectedGender === 'G' ? 'bg-black text-white' : 'bg-gray-200']"
-      >
-        Девочки
-      </button>
-    </div>
+      <!-- Фильтр по полу (перенесён выше CategoriesBar) -->
+      <div class="filter-gender section-block">
+        <button
+          @click="applyGenderFilter(null)"
+          :class="['filter-button', selectedGender === null ? 'active' : '']"
+        >
+          Все
+        </button>
+        <button
+          @click="applyGenderFilter('B')"
+          :class="['filter-button', selectedGender === 'B' ? 'active' : '']"
+        >
+          Мальчики
+        </button>
+        <button
+          @click="applyGenderFilter('G')"
+          :class="['filter-button', selectedGender === 'G' ? 'active' : '']"
+        >
+          Девочки
+        </button>
+      </div>
 
-    <!-- Сетка товаров -->
-    <div class="products-grid grid gap-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-      <template v-if="Array.isArray(products)">
-        <ProductCard
-          v-for="product in products"
-          :key="product.id"
-          :product="product"
+      <!-- Компонент выбора категорий -->
+      <div class="section-block">
+        <CategoriesBar
+          v-model="selectedCategoryId"
+          @select-category="onCategorySelected"
         />
-      </template>
-    </div>
+      </div>
 
-    <!-- Если нет товаров -->
-    <div v-if="!loading && Array.isArray(products) && products.length === 0" class="text-center mt-8 text-gray-500">
-      Нет товаров, соответствующих выбранным фильтрам.
-    </div>
+      <!-- Сетка товаров -->
+      <div class="section-block">
+        <div v-if="loading" class="loading-container">
+          <span>Загрузка товаров...</span>
+        </div>
 
-    <!-- Индикатор загрузки -->
-    <div v-if="loading" class="text-center mt-8">
-      <span>Загрузка...</span>
+        <div
+          v-else
+          class="products-grid"
+        >
+          <template v-if="Array.isArray(products) && products.length">
+            <ProductCard
+              v-for="product in products"
+              :key="product.id"
+              :product="product"
+            />
+          </template>
+
+          <div
+            v-if="!loading && Array.isArray(products) && products.length === 0"
+            class="empty-message"
+          >
+            Нет товаров, соответствующих выбранным фильтрам.
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import api from '@/services/api';           // ваш api.js
+import api from '@/services/api';
+import AppHeader from '@/components/AppHeader.vue';
 import ProductCard from '@/components/ProductCart.vue';
 import CategoriesBar from '@/components/CategoriesBar.vue';
 
-// 1. Состояние страницы
 const products = ref([]);
 const selectedGender = ref(null);
 const selectedCategoryId = ref(null);
 const loading = ref(false);
 
-// 2. Загрузка товаров с фильтрами
 const fetchProducts = async () => {
   loading.value = true;
   try {
-    let response;
     const params = {};
     if (selectedCategoryId.value !== null) {
       params.categories = selectedCategoryId.value;
     }
+    // Если ваш бэк умеет «gender=B/G» в getProducts:
     if (selectedGender.value === 'B') {
-      response = await api.getBoysProducts(params);
+      params.gender = 'B';
     } else if (selectedGender.value === 'G') {
-      response = await api.getGirlsProducts(params);
-    } else {
-      response = await api.getProducts(params);
+      params.gender = 'G';
     }
 
+    // Единый вызов:
+    const response = await api.getProducts(params);
     const data = response.data;
+
     if (Array.isArray(data.results)) {
       products.value = data.results;
     } else if (Array.isArray(data)) {
@@ -91,6 +103,18 @@ const fetchProducts = async () => {
     } else {
       products.value = [];
     }
+
+    // Если бэкенд НЕ поддерживает параметр gender в getProducts,
+    // тогда вместо этого используйте клиентскую фильтрацию:
+    //
+    // let list = Array.isArray(data.results) ? data.results : data;
+    // if (selectedGender.value === 'B') {
+    //   products.value = list.filter(item => item.gender === 'B');
+    // } else if (selectedGender.value === 'G') {
+    //   products.value = list.filter(item => item.gender === 'G');
+    // } else {
+    //   products.value = list;
+    // }
   } catch (err) {
     console.error('Ошибка при получении товаров:', err);
     products.value = [];
@@ -99,30 +123,97 @@ const fetchProducts = async () => {
   }
 };
 
-// 3. Обработчик фильтра по полу
 const applyGenderFilter = (gender) => {
+  // Если повторный клик по той же кнопке — сброс
   selectedGender.value = (selectedGender.value === gender ? null : gender);
   fetchProducts();
 };
 
-// 4. Обработчик события из CategoriesBar
 const onCategorySelected = (catId) => {
-  // catId может быть либо null (открыть все), либо число (конкретная категория)
+  // catId = null (все категории) или конкретный ID
   selectedCategoryId.value = catId;
   fetchProducts();
 };
 
-// 5. При монтировании подгружаем сразу товары для «Всех»
 onMounted(fetchProducts);
 </script>
 
 <style scoped>
+/* Обёртка всей страницы: нужен отступ, чтобы контент не подлезал под AppHeader */
 .catalog-page {
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding-top: 88px; /* высота шапки AppHeader */
+  background-color: #f5f5f5;
+  min-height: 100vh;
 }
 
-.filter-gender button {
+/* Контейнер, аналогично другим страницам */
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 20px 16px;
+}
+
+/* Заголовок страницы */
+.page-title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #222;
+}
+
+/* Блок секции (отступ снизу) */
+.section-block {
+  margin-bottom: 1.5rem;
+}
+
+/* Фильтр по полу */
+.filter-gender {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Кнопки фильтра */
+.filter-button {
+  padding: 8px 16px;
+  background-color: #f0f0f0;
+  color: #333;
+  border: none;
+  border-radius: 24px;
+  font-size: 0.9rem;
+  font-weight: 500;
   cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.filter-button:hover {
+  background-color: #e0e0e0;
+}
+
+.filter-button.active {
+  background-color: #000;
+  color: #fff;
+}
+
+/* Сетка товаров */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+/* Сообщение, когда товаров нет */
+.empty-message {
+  text-align: center;
+  color: #666;
+  margin-top: 2rem;
+  font-size: 1rem;
+}
+
+/* Индикатор загрузки */
+.loading-container {
+  text-align: center;
+  color: #666;
+  font-size: 1rem;
 }
 </style>
