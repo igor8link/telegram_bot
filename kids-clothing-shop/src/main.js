@@ -19,10 +19,9 @@ const initializeStores = async () => {
   const favoriteStore = useFavoriteStore()
   const cartStore = useCartStore()
   
-  // Initialize auth first
+
   await authStore.initializeAuth()
-  
-  // Then load favorites if user is authenticated
+
   if (authStore.isAuthenticated) {
     try {
       await favoriteStore.loadFavoritesFromAPI()
@@ -37,11 +36,9 @@ const initializeStores = async () => {
   }
 }
 
-// Initialize stores and then mount the app
 initializeStores().then(() => {
   app.mount('#app')
 }).catch(error => {
   console.error('Failed to initialize stores:', error)
-  // Mount the app anyway
   app.mount('#app')
 })

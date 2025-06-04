@@ -115,30 +115,8 @@ const router = createRouter({
   }
 });
 
-// Navigation guards
-// router.beforeEach((to, from, next) => {
-//   // Update page title
-//   document.title = to.meta.title ? `${to.meta.title} | Kids Clothing Shop` : 'Kids Clothing Shop';
-  
-//   // Check for protected routes
-//   if (to.matched.some(record => record.meta.requiresAuth)) {
-//     // Check if user is logged in
-//     const token = localStorage.getItem('token');
-//     if (!token) {
-//       next({
-//         path: '/login',
-//         query: { redirect: to.fullPath }
-//       });
-//     } else {
-//       next();
-//     }
-//   } else {
-//     next();
-//   }
-// });
-
+// Навигационная защита
 router.beforeEach((to, from, next) => {
-  // Update page title
   document.title = to.meta.title ? `${to.meta.title} | Kids Clothing Shop` : 'Kids Clothing Shop';
   
   // Check for protected routes
@@ -146,8 +124,7 @@ router.beforeEach((to, from, next) => {
     const authStore = useAuthStore();
     
     if (!authStore.isAuthenticated) {
-      // Redirect to home page if not authenticated
-      // The user icon will open the login modal
+      // Модальное окно, если user не аутентифицирован
       next('/');
     } else {
       next();

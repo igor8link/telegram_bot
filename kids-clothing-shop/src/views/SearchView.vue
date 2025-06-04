@@ -98,6 +98,7 @@ onMounted(() => {
 <style scoped>
 .search-page {
   padding-bottom: 40px;
+  margin-top: 88px;
 }
 .container {
   max-width: 1000px;

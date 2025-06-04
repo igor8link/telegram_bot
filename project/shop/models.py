@@ -107,7 +107,7 @@ class Size(models.Model):
 
 
 class ProductVariant(models.Model):
-    """Варианты товаров определённых цветов, их доступность"""
+    """Объединение всех параметров товаар, картинки, размеры, цвет"""
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants')
     color = models.ForeignKey(Color, on_delete=models.CASCADE)
     sizes = models.ManyToManyField(Size, through='ProductStock')
@@ -115,7 +115,7 @@ class ProductVariant(models.Model):
     
     class Meta:
         unique_together = [['product', 'color']]
-        verbose_name_plural = 'Разные варианты цветов одних и тех же товаров'
+        verbose_name_plural = 'Создание карточки товара'
     
     def __str__(self):
         return f"{self.product.title} - {self.color.name}"
