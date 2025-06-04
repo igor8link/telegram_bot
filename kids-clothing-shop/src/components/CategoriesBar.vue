@@ -1,6 +1,5 @@
 <template>
   <div class="categories-bar">
-    <!-- 1) Кнопка-тоггл "показать/скрыть категории" -->
     <button
       class="toggle-button"
       @click="toggleOpen"
@@ -15,13 +14,11 @@
       </span>
     </button>
 
-    <!-- 2) Обёртка для пил-кнопок категорий -->
     <transition name="fade-slide">
       <div
         v-show="isOpen"
         class="pills-container"
       >
-        <!-- Кнопка "Открыть все" -->
         <button
           class="pill-button"
           :class="{ active: localSelectedId === null }"
@@ -31,7 +28,6 @@
           Открыть все
         </button>
 
-        <!-- Рендерим каждую категорию в виде «пилы» -->
         <button
           v-for="cat in categories"
           :key="cat.id"
@@ -49,9 +45,8 @@
 
 <script setup>
 import { ref, watch, onMounted } from 'vue';
-import api from '@/services/api'; // Убедитесь, что путь к вашему api.js указан правильно
+import api from '@/services/api'; 
 
-// 1. Определяем пропс modelValue (v-model)
 const props = defineProps({
   modelValue: {
     type: [Number, null],
@@ -59,17 +54,11 @@ const props = defineProps({
   }
 });
 
-// 2. Объявляем события, которые будем эмитить
 const emit = defineEmits(['update:modelValue', 'select-category']);
 
-// 3. Локальный стейт для видимости списка категорий
 const isOpen = ref(false);
-
-// 4. Локальный стейт для хранимого выбранного ID категории
-//    Он синхронизируется с props.modelValue через watch
 const localSelectedId = ref(props.modelValue);
 
-// 5. Подписываемся, чтобы при изменении родительского modelValue обновлять localSelectedId
 watch(
   () => props.modelValue,
   (newVal) => {
@@ -78,40 +67,30 @@ watch(
   { immediate: true }
 );
 
-// 6. Функция переключения видимости (показать/скрыть)
 const toggleOpen = () => {
   isOpen.value = !isOpen.value;
 };
 
-// 7. При выборе категории (либо null) эмитим два события:
-//    - update:modelValue (для синхронизации v-model с родителем)
-//    - select-category (чтобы родитель своевременно вызвал fetchProducts)
 const selectCategory = (catId) => {
   localSelectedId.value = catId;
   emit('update:modelValue', catId);
   emit('select-category', catId);
 
-  // Если нужно, чтобы после клика меню закрывалось, раскомментируйте:
-  // isOpen.value = false;
+  isOpen.value = false;
 };
 
-// 8. Реактивный массив для хранения всех категорий
 const categories = ref([]);
 
-// 9. Функция загрузки категорий из API
 const fetchCategories = async () => {
   try {
     const response = await api.getCategories();
 
-    // Если DRF отдаёт пагинированный объект { count, next, previous, results: [...] }
     if (response.data && Array.isArray(response.data.results)) {
       categories.value = response.data.results;
     }
-    // Если пагинация отключена и вернулся сразу массив
     else if (Array.isArray(response.data)) {
       categories.value = response.data;
     }
-    // В иных случаях оставляем пустой массив
     else {
       categories.value = [];
     }
@@ -121,7 +100,6 @@ const fetchCategories = async () => {
   }
 };
 
-// 10. Загружаем категории при монтировании
 onMounted(fetchCategories);
 </script>
 
@@ -130,7 +108,6 @@ onMounted(fetchCategories);
   margin-bottom: 1rem;
 }
 
-/* Стили для кнопки-тоггла */
 .toggle-button {
   display: inline-flex;
   align-items: center;
@@ -141,21 +118,20 @@ onMounted(fetchCategories);
   padding: 0.25rem 0;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #e6007e; /* можно настроить под вашу тему */
+  color: #333; 
 }
 
 .toggle-line {
   display: inline-block;
   width: 16px;
   height: 2px;
-  background-color: #e6007e;
+  background-color: #333;
 }
 
 .toggle-text {
   text-transform: lowercase;
 }
 
-/* Контейнер для пил-кнопок */
 .pills-container {
   margin-top: 0.5rem;
   display: flex;
@@ -164,7 +140,6 @@ onMounted(fetchCategories);
   padding-bottom: 0.25rem;
 }
 
-/* Анимация fade + slide */
 .fade-slide-enter-active,
 .fade-slide-leave-active {
   transition: opacity 0.2s ease, transform 0.2s ease;
@@ -176,7 +151,6 @@ onMounted(fetchCategories);
   transform: translateY(-8px);
 }
 
-/* Стили для каждой "пилы" */
 .pill-button {
   flex: 0 0 auto;
   white-space: nowrap;
@@ -195,8 +169,8 @@ onMounted(fetchCategories);
 }
 
 .pill-button.active {
-  background-color: #e6007e; /* цвет для активной категории */
+  background-color: #333; 
   color: #fff;
-  border-color: #e6007e;
+  border-color: #333;
 }
 </style>

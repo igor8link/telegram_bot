@@ -6,7 +6,7 @@
         <button class="menu-button" @click="toggleMenu">
           <span class="menu-icon"></span>
         </button>
-        <router-link to="/" class="logo">
+        <router-link to="/catalog" class="logo">
           <img src="@/assets/shirt-clothes-svgrepo-com.png" alt="kids" />
         </router-link>
       </div>
@@ -68,8 +68,7 @@
       <nav class="side-nav">
         <router-link to="/categories/girls" class="side-nav-item" @click="toggleMenu">ДЕВОЧКИ</router-link>
         <router-link to="/categories/boys" class="side-nav-item" @click="toggleMenu">МАЛЬЧИКИ</router-link>
-        <router-link to="/new-arrivals" class="side-nav-item" @click="toggleMenu">НОВИНКИ</router-link>
-        <router-link to="/sale" class="side-nav-item" @click="toggleMenu">РАСПРОДАЖА</router-link>
+        <router-link to="/catalog" class="side-nav-item" @click="toggleMenu">КАТАЛОГ</router-link>
         <router-link to="/about" class="side-nav-item" @click="toggleMenu">О НАС</router-link>
       </nav>
     </div>

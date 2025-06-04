@@ -4,6 +4,8 @@
 
     <div class="container">
       <h1 class="page-title">Каталог</h1>
+
+      <!-- Фильтр по полу -->
       <div class="filter-gender section-block">
         <button
           @click="applyGenderFilter(null)"
@@ -25,6 +27,7 @@
         </button>
       </div>
 
+      <!-- CategoriesBar (может быть свернут/развернут) -->
       <div class="section-block">
         <CategoriesBar
           v-model="selectedCategoryId"
@@ -32,15 +35,13 @@
         />
       </div>
 
+      <!-- Сетка товаров -->
       <div class="section-block">
         <div v-if="loading" class="loading-container">
           <span>Загрузка товаров...</span>
         </div>
 
-        <div
-          v-else
-          class="products-grid"
-        >
+        <div v-else class="products-grid">
           <template v-if="Array.isArray(products) && products.length">
             <ProductCard
               v-for="product in products"
@@ -78,9 +79,13 @@ const fetchProducts = async () => {
   try {
     let response;
     const params = {};
+
+    // Если выбрана какая-то категория, передаем её в параметры
     if (selectedCategoryId.value !== null) {
       params.categories = selectedCategoryId.value;
     }
+
+    // Выбор эндпоинта в зависимости от гендера
     if (selectedGender.value === 'B') {
       response = await api.getBoysProducts(params);
     } else if (selectedGender.value === 'G') {
@@ -90,7 +95,11 @@ const fetchProducts = async () => {
     }
 
     const data = response.data;
-    products.value = Array.isArray(data.results) ? data.results : Array.isArray(data) ? data : [];
+    products.value = Array.isArray(data.results) 
+      ? data.results 
+      : Array.isArray(data) 
+        ? data 
+        : [];
   } catch (err) {
     console.error(err);
     products.value = [];
@@ -99,9 +108,21 @@ const fetchProducts = async () => {
   }
 };
 
-
+/**
+ * Нажатие на «Все» должно:
+ * 1) Сбросить гендер (selectedGender = null) – мы уже передали null как аргумент сюда.
+ * 2) Сбросить категорию (selectedCategoryId = null) – чтобы «Открыть всё» в CategoriesBar сработало так же.
+ * 3) Перезапросить товары.
+ */
 const applyGenderFilter = (gender) => {
+  // Если кликнули по той же кнопке — снимаем фильтр
   selectedGender.value = (selectedGender.value === gender ? null : gender);
+
+  // Если выбрали «Все» (т.е. gender = null), тоже сбросим категорию
+  if (selectedGender.value === null) {
+    selectedCategoryId.value = null;
+  }
+
   fetchProducts();
 };
 
@@ -115,8 +136,8 @@ onMounted(fetchProducts);
 
 <style scoped>
 .catalog-page {
+  /* Отступ сверху, чтобы контент не закрывался AppHeader */
   padding-top: 88px; 
-  margin-top: 88px;
   background-color: #f5f5f5;
   min-height: 100vh;
 }

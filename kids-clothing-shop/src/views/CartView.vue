@@ -10,7 +10,6 @@
         </p>
       </div>
 
-      <!--  Ошибка -->
       <div v-if="loading" class="loading-container">
         <div class="loading-spinner"></div>
         <p>Загрузка корзины...</p>
@@ -34,7 +33,7 @@
         </div>
         <h2>Корзина пуста</h2>
         <p>Добавляйте товары в корзину, чтобы оформить заказ</p>
-        <router-link to="/" class="continue-shopping-button">
+        <router-link to="/catalog" class="continue-shopping-button">
           Продолжить покупки
         </router-link>
       </div>
@@ -63,7 +62,6 @@
               <strong>{{ formatPrice(item.product_info.total_price) }}</strong>
             </p>
 
-            <!-- Кнопка удаления -->
             <button 
               @click="removeItem(item.id)" 
               class="remove-button" 
@@ -99,12 +97,10 @@ const loading = computed(() => cartStore.loading);
 const cartItems = computed(() => cartStore.items);
 const totalPrice = computed(() => cartStore.totalPrice);
 
-// Подсчёт общего количества товаров
 const totalQuantity = computed(() =>
   cartStore.items.reduce((sum, item) => sum + item.quantity, 0)
 );
 
-// Отображение цены в формате ₽
 const formatPrice = (value) => {
   if (typeof value !== 'number') return '';
   return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(value);
@@ -136,7 +132,6 @@ const removeItem = async (itemId) => {
   }
 };
 
-// Функция загрузки корзины с обработкой ошибок
 const fetchCart = async () => {
   error.value = null;
   try {
@@ -375,8 +370,14 @@ onMounted(() => {
 
 
 @media (max-width: 768px) {
-  .container { padding: 1rem; }
-  .cart-item { flex-direction: column; }
-  .item-details { width: 100%; padding-left: 0; margin-top: 1rem; }
+  .container { 
+    padding: 1rem; 
+  }
+  .cart-item {
+     flex-direction: column; 
+    }
+  .item-details { 
+    width: 100%; padding-left: 0; margin-top: 1rem; 
+  }
 }
 </style>

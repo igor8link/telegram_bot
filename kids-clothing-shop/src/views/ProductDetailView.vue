@@ -68,8 +68,8 @@
           <ProductsGrid 
             title="ТОП ПРОДАЖ"
             :limit="8"
-            view-all-link="/products/new"
-            gender="boys"
+            view-all-link="/catalog"
+            gender="null"
           />
         </div>
       </section>
