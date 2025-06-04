@@ -10,7 +10,6 @@
         </p>
       </div>
 
-      <!-- Loader / Ошибка -->
       <div v-if="loading" class="loading-container">
         <div class="loading-spinner"></div>
         <p>Загрузка корзины...</p>
@@ -26,7 +25,7 @@
       <!-- Пустая корзина -->
       <div v-else-if="cartItems.length === 0" class="empty-cart">
         <div class="empty-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 3h2l.4 2M7 13h10l4-8H5.4"/>
             <circle cx="7" cy="21" r="2"/>
             <circle cx="17" cy="21" r="2"/>
@@ -34,7 +33,7 @@
         </div>
         <h2>Корзина пуста</h2>
         <p>Добавляйте товары в корзину, чтобы оформить заказ</p>
-        <router-link to="/" class="continue-shopping-button">
+        <router-link to="/catalog" class="continue-shopping-button">
           Продолжить покупки
         </router-link>
       </div>
@@ -46,46 +45,23 @@
           :key="item.id" 
           class="cart-item"
         >
-          <!-- Компонент с изображением/названием/ссылкой на товар -->
           <div class="item-info">
             <ProductCard 
-              :product="getProductFromCart(item)" 
+              :product="item.product_info" 
               :showAddToCartButton="false"
             />
           </div>
 
           <div class="item-details">
-            <!-- Например, отображаем цвет/размер: -->
             <p class="item-variant">
-              Цвет: {{ item.product_stock.variant.color.name }}, 
-              Размер: {{ item.product_stock.size.name }}
+              Цвет: {{ item.product_info.color }}, 
+              Размер: {{ item.product_info.size }}
             </p>
-            <!-- Цена за единицу и общая цена -->
             <p class="item-price">
-              {{ formatPrice(item.product_stock.variant.product.sale_price || item.product_stock.variant.product.price) }} × {{ item.quantity }} = 
-              <strong>{{ formatPrice(getItemTotal(item)) }}</strong>
+              {{ formatPrice(item.product_info.price) }} × {{ item.quantity }} = 
+              <strong>{{ formatPrice(item.product_info.total_price) }}</strong>
             </p>
 
-            <!-- Управление количеством -->
-            <div class="quantity-control">
-              <button 
-                @click="changeQuantity(item, item.quantity - 1)" 
-                :disabled="item.quantity <= 1 || updatingId === item.id"
-              >–</button>
-              <input 
-                type="number" 
-                v-model.number="item.quantity" 
-                @change="onQuantityInput(item)" 
-                min="1" 
-                :disabled="updatingId === item.id"
-              />
-              <button 
-                @click="changeQuantity(item, item.quantity + 1)" 
-                :disabled="updatingId === item.id"
-              >+</button>
-            </div>
-
-            <!-- Кнопка удаления -->
             <button 
               @click="removeItem(item.id)" 
               class="remove-button" 
@@ -96,7 +72,6 @@
           </div>
         </div>
 
-        <!-- Подвал корзины: итоговая сумма и кнопка перейти к оформлению -->
         <div class="cart-summary">
           <p>Итого: <strong>{{ formattedTotalPrice }}</strong></p>
           <router-link to="/checkout" class="checkout-button">
@@ -113,33 +88,30 @@ import { ref, computed, onMounted } from 'vue';
 import { useCartStore } from '@/stores/cartStore';
 import { useAuthStore } from '@/stores/authStore';
 import AppHeader from '@/components/AppHeader.vue';
-import ProductCard from '@/components/ProductCart.vue'; // убедитесь, что ваш компонент называется именно так
+import ProductCard from '@/components/ProductCart.vue';
 
 const cartStore = useCartStore();
 const authStore = useAuthStore();
 
 const loading = computed(() => cartStore.loading);
-const error = computed(() => cartStore.error);
-const cartItems = computed(() => cartStore.cartItems);
-const updatingId = computed(() => cartStore.updatingId);
+const cartItems = computed(() => cartStore.items);
+const totalPrice = computed(() => cartStore.totalPrice);
 
-// Форматирует цену, например, 1234.5 → "1 234,50 ₽"
+const totalQuantity = computed(() =>
+  cartStore.items.reduce((sum, item) => sum + item.quantity, 0)
+);
+
 const formatPrice = (value) => {
   if (typeof value !== 'number') return '';
   return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(value);
 };
 
-// Вспомогательный геттер: внутри cartItem есть product_stock.variant.product
-const getProductFromCart = (item) => {
-  return item.product_stock.variant.product;
-};
-
-// Общая сумма
-const totalPrice = computed(() => cartStore.totalPrice);
 const formattedTotalPrice = computed(() => formatPrice(totalPrice.value));
-const totalQuantity = computed(() => cartStore.totalQuantity);
 
-// Склонение слова «товар»
+const error = ref(null);
+
+const updatingId = ref(null);
+
 const getProductWord = (count) => {
   const lastDigit = count % 10;
   const lastTwoDigits = count % 100;
@@ -149,28 +121,25 @@ const getProductWord = (count) => {
   return 'товаров';
 };
 
-// При маунте – загружаем корзину
+const removeItem = async (itemId) => {
+  updatingId.value = itemId;
+  try {
+    await cartStore.removeItem(itemId);
+  } catch (e) {
+    console.error('Ошибка удаления товара из корзины:', e);
+  } finally {
+    updatingId.value = null;
+  }
+};
+
 const fetchCart = async () => {
-  await cartStore.fetchCart();
-};
-
-// Изменить количество (кнопки + и –)
-const changeQuantity = (item, newQty) => {
-  if (newQty < 1) return;
-  item.quantity = newQty;
-  // После изменения локального поля уходим в API/локальный стор
-  cartStore.updateCartItem(item);
-};
-
-// Если пользователь ввёл число вручную
-const onQuantityInput = (item) => {
-  if (item.quantity < 1) item.quantity = 1;
-  cartStore.updateCartItem(item);
-};
-
-// Удалить позицию
-const removeItem = (itemId) => {
-  cartStore.removeFromCart(itemId);
+  error.value = null;
+  try {
+    await cartStore.loadCart();
+  } catch (e) {
+    error.value = 'Ошибка загрузки корзины';
+    console.error(e);
+  }
 };
 
 onMounted(() => {
@@ -306,7 +275,6 @@ onMounted(() => {
 
 .item-info {
   flex: 1;
-  /* Здесь рендерится <ProductCard> без кнопки "Добавить в корзину" */
 }
 
 .item-details {
@@ -400,10 +368,16 @@ onMounted(() => {
   opacity: 0.9;
 }
 
-/* Адаптив */
+
 @media (max-width: 768px) {
-  .container { padding: 1rem; }
-  .cart-item { flex-direction: column; }
-  .item-details { width: 100%; padding-left: 0; margin-top: 1rem; }
+  .container { 
+    padding: 1rem; 
+  }
+  .cart-item {
+     flex-direction: column; 
+    }
+  .item-details { 
+    width: 100%; padding-left: 0; margin-top: 1rem; 
+  }
 }
 </style>

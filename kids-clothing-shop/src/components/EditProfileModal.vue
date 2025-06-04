@@ -35,12 +35,12 @@
           </div>
           
           <div class="form-group">
-            <label for="edit-first-name">Имя*</label>
+            <label for="edit-first-name">ФИО</label>
             <input
               id="edit-first-name"
               v-model="formData.first_name"
               type="text"
-              placeholder="Ваше имя"
+              placeholder="Иванов Иван Иванович"
               required
               class="form-input"
             />
@@ -52,7 +52,7 @@
               id="edit-phone"
               v-model="formData.phone_number"
               type="tel"
-              placeholder="+7 (999) 123-45-67"
+              placeholder="+7 (999) 999-99-99"
               class="form-input"
             />
           </div>
@@ -62,7 +62,7 @@
             <textarea
               id="edit-address"
               v-model="formData.address"
-              placeholder="Ваш адрес доставки"
+              placeholder="Ваш адрес"
               class="form-input form-textarea"
               rows="3"
             ></textarea>

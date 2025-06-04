@@ -3,7 +3,6 @@
     <main class="main-content">
       <section class="hero-split">
         <div class="split-container">
-          <!-- Girls Section -->
           <router-link to="/categories/girls" class="split-section girls-section">
             <div class="split-image">
               <div class="image-placeholder girls-placeholder">
@@ -18,8 +17,7 @@
               <h2 class="split-title">ДЕВОЧКИ</h2>
             </div>
           </router-link>
-          
-          <!-- Boys Section -->
+
           <router-link to="/categories/boys" class="split-section boys-section">
             <div class="split-image">
               <div class="image-placeholder boys-placeholder">
@@ -46,20 +44,17 @@ import { ref, onMounted } from 'vue';
 
 <style scoped>
 .home {
-  /* Remove any margins/padding that might cause white space */
   margin: 0;
   padding: 0;
 }
 
 .main-content {
-  /* Reduce padding-top or remove it completely if header overlaps */
   padding-top: 0;
   margin: 0;
 }
 
-/* Hero Split Section */
 .hero-split {
-  height: 100vh; /* Use full viewport height */
+  height: 100vh; 
   min-height: 600px;
   position: relative;
   overflow: hidden;
@@ -103,7 +98,6 @@ import { ref, onMounted } from 'vue';
   transition: transform 0.5s ease;
 }
 
-/* Image Placeholders */
 .image-placeholder {
   width: 100%;
   height: 100%;
@@ -190,9 +184,7 @@ import { ref, onMounted } from 'vue';
   text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
 }
 
-/* Remove split button styles as they're no longer needed */
 
-/* Girls Section Styling */
 .girls-section .split-overlay {
   background: linear-gradient(
     135deg, 
@@ -201,7 +193,6 @@ import { ref, onMounted } from 'vue';
   );
 }
 
-/* Boys Section Styling */
 .boys-section .split-overlay {
   background: linear-gradient(
     135deg, 
@@ -210,18 +201,17 @@ import { ref, onMounted } from 'vue';
   );
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .hero-split {
-    height: 100vh; /* Keep full height on mobile */
+    height: 100vh; 
   }
   
   .split-container {
-    flex-direction: row; /* Keep horizontal layout on mobile */
+    flex-direction: row; 
   }
   
   .split-section {
-    min-height: 100vh; /* Full height for each section */
+    min-height: 100vh; 
   }
   
   .split-title {
@@ -250,7 +240,6 @@ import { ref, onMounted } from 'vue';
   }
 }
 
-/* Sections */
 .section {
   margin: 4rem 0;
   padding: 2rem 0;

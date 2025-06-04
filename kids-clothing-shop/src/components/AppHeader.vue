@@ -1,14 +1,17 @@
 <template>
   <header class="header" :class="{ 'scrolled': scrolled }">
     <div class="header-content">
-      <button class="menu-button" @click="toggleMenu">
-        <span class="menu-icon"></span>
-      </button>
+      <!-- Левый блок -->
+      <div class="header-left">
+        <button class="menu-button" @click="toggleMenu">
+          <span class="menu-icon"></span>
+        </button>
+        <router-link to="/catalog" class="logo">
+          <img src="@/assets/shirt-clothes-svgrepo-com.png" alt="kids" />
+        </router-link>
+      </div>
       
-      <router-link to="/" class="logo">
-        <img src="@/assets/logo.svg" alt="kids" />
-      </router-link>
-      
+      <!-- Правый блок -->
       <div class="header-actions">
         <button class="action-button" @click="toggleSearch">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon">
@@ -65,14 +68,11 @@
       <nav class="side-nav">
         <router-link to="/categories/girls" class="side-nav-item" @click="toggleMenu">ДЕВОЧКИ</router-link>
         <router-link to="/categories/boys" class="side-nav-item" @click="toggleMenu">МАЛЬЧИКИ</router-link>
-        <router-link to="/new-arrivals" class="side-nav-item" @click="toggleMenu">НОВИНКИ</router-link>
-        <router-link to="/sale" class="side-nav-item" @click="toggleMenu">РАСПРОДАЖА</router-link>
+        <router-link to="/catalog" class="side-nav-item" @click="toggleMenu">КАТАЛОГ</router-link>
         <router-link to="/about" class="side-nav-item" @click="toggleMenu">О НАС</router-link>
-        <router-link to="/delivery" class="side-nav-item" @click="toggleMenu">ДОСТАВКА</router-link>
       </nav>
     </div>
     
-    <!-- Login Modal -->
     <LoginModal :is-open="loginModalOpen" @close="closeLoginModal" />
   </header>
 </template>
@@ -98,7 +98,6 @@ const toggleMenu = () => {
     searchOpen.value = false;
   }
   
-  // Защита от скрола при открытом меню
   if (menuOpen.value) {
     document.body.style.overflow = 'hidden';
   } else {
@@ -128,10 +127,8 @@ const setActiveCategory = (category) => {
 
 const handleUserIconClick = () => {
   if (authStore.isAuthenticated) {
-    // Если аутентифицирован, то переход на страницу профиля
     router.push('/account');
   } else {
-    // Форма аутентификации
     loginModalOpen.value = true;
   }
 };
@@ -181,7 +178,7 @@ onUnmounted(() => {
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #2160d5b2;
+  background-color: #ffffff;
   z-index: 1000;
   transition: box-shadow 0.3s ease;
 }
@@ -192,14 +189,18 @@ onUnmounted(() => {
 
 .header-content {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  height: 86px;
+  height: 88px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
 }
 
 .logo {
-  height: 30px;
+  height: 40px;
 }
 
 .logo img {
@@ -215,6 +216,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-right: 12px;
 }
 
 .menu-icon {
@@ -245,6 +247,7 @@ onUnmounted(() => {
 }
 
 .header-actions {
+  margin-left: auto;
   display: flex;
   gap: 16px;
 }

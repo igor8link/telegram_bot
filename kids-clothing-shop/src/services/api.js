@@ -8,10 +8,9 @@ const apiClient = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json'
   },
-  withCredentials: true // Enable cookies for session-based authentication
+  withCredentials: true // cookie
 });
 
-// Add request interceptor to include auth token
 apiClient.interceptors.request.use(
   config => {
     const token = localStorage.getItem('token');
@@ -52,26 +51,23 @@ apiClient.interceptors.response.use(
       data: error.response?.data,
       message: error.message
     });
-    
-    // Handle token expiration
+
     if (error.response?.status === 401) {
-      // Clear tokens and redirect to login if token is invalid or expired
+
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
-      
-      // Only redirect to login if not already there and not on home page
+
       if (!window.location.pathname.includes('/login') && window.location.pathname !== '/') {
         window.location.href = '/';
       }
     }
-    
-    // Handle other errors
+
     return Promise.reject(error);
   }
 );
 
 export default {
-  // Authentication
+
   login(credentials) {
     console.log('Attempting login with credentials:', credentials);
     return apiClient.post('/token/', credentials);
@@ -85,8 +81,7 @@ export default {
     console.log('Attempting registration with data:', userData);
     return apiClient.post('/auth/users/', userData);
   },
-  
-  // Profile
+
   getUserProfile() {
     return apiClient.get('/profiles/me/');
   },
@@ -94,8 +89,7 @@ export default {
   updateUserProfile(profileData) {
     return apiClient.put('/profiles/update_me/', profileData);
   },
-  
-  // Products
+
   getProducts(params = {}) {
     return apiClient.get('/products/', { params });
   },
@@ -115,8 +109,7 @@ export default {
   getGirlsProducts(params = {}) {
     return apiClient.get('/products/girls/', { params });
   },
-  
-  // Categories
+
   getCategories() {
     return apiClient.get('/categories/');
   },
@@ -128,8 +121,7 @@ export default {
   getGirlsCategories() {
     return apiClient.get('/categories/girls/');
   },
-  
-  // Favorites
+
   getFavorites() {
     return apiClient.get('/favorites/');
   },
@@ -137,8 +129,7 @@ export default {
   toggleFavorite(productId) {
     return apiClient.post('/favorites/toggle/', { product_id: productId });
   },
-  
-  // Cart
+
   getCurrentCart() {
     return apiClient.get('/carts/current/');
   },
@@ -158,8 +149,7 @@ export default {
   mergeCart() {
   return apiClient.post('/carts/merge/');
   },
-  
-  // Orders
+
   getOrders() {
     return apiClient.get('/orders/');
   },
@@ -171,8 +161,7 @@ export default {
   createOrder(orderData) {
     return apiClient.post('/orders/', orderData);
   },
-  
-  // Search
+
   search(query) {
     return apiClient.get('/products/', { params: { search: query } });
   }

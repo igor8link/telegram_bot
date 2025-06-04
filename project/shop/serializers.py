@@ -239,7 +239,9 @@ class CartSerializer(serializers.ModelSerializer):
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product = ProductListSerializer(read_only=True)
-    
+    variant = ProductVariantSerializer(read_only=True)
+    size    = SizeSerializer(read_only=True)
+
     class Meta:
         model = OrderItem
         fields = ['id', 'product', 'variant', 'size', 'price', 'quantity']
@@ -255,4 +257,4 @@ class OrderSerializer(serializers.ModelSerializer):
             'id', 'user', 'full_name', 'email', 'phone', 'address',
             'total_price', 'status', 'items', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'total_price', 'status', 'user']

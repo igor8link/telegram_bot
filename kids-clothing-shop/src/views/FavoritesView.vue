@@ -59,7 +59,7 @@ import { ref, onMounted } from 'vue';
 import AppHeader from '@/components/AppHeader.vue';
 import { useAuthStore } from '@/stores/authStore';
 import { useFavoriteStore } from '@/stores/favoriteStore';
-import ProductCard from '@/components/ProductCart.vue'; // Note: Using your existing component name
+import ProductCard from '@/components/ProductCart.vue'; 
 import api from '@/services/api';
 
 const authStore = useAuthStore();
@@ -90,7 +90,6 @@ const getProductWord = (count) => {
 };
 
 const getProductFromFavorite = (favorite) => {
-  // Handle both API format (with .product) and local format (direct product)
   return favorite.product || favorite;
 };
 
@@ -100,28 +99,23 @@ const fetchFavorites = async () => {
   
   try {
     if (authStore.isAuthenticated) {
-      // Fetch favorites from API for authenticated users
-      console.log('Fetching favorites from API for authenticated user');
+      console.log('Избранное для вошедшего пользователя');
       const response = await api.getFavorites();
-      console.log('API favorites response:', response.data);
+      console.log('API:', response.data);
       favorites.value = response.data.results || response.data;
-      
-      // Sync with local store
       favoriteStore.syncFavorites(favorites.value.map(f => f.product));
     } else {
-      // Use local favorites for non-authenticated users
-      console.log('Using local favorites for non-authenticated user');
+      console.log('Использваоние кэша');
       favorites.value = favoriteStore.favoriteItems.map(product => ({
         id: `local-${product.id}`,
         product: product
       }));
-      console.log('Local favorites:', favorites.value);
+      console.log('Local-storage:', favorites.value);
     }
   } catch (err) {
-    console.error('Error fetching favorites:', err);
+    console.error('Ошибка:', err);
     error.value = 'Ошибка загрузки избранных товаров. Попробуйте еще раз.';
-    
-    // Fallback to local favorites
+
     favorites.value = favoriteStore.favoriteItems.map(product => ({
       id: `local-${product.id}`,
       product: product
@@ -136,20 +130,17 @@ const removeFavorite = async (productId) => {
   
   try {
     if (authStore.isAuthenticated) {
-      // Remove from API
       await api.toggleFavorite(productId);
     }
-    
-    // Remove from local store
+
     favoriteStore.removeFavorite(productId);
-    
-    // Remove from local list
+
     favorites.value = favorites.value.filter(f => {
       const product = getProductFromFavorite(f);
       return product.id !== productId;
     });
   } catch (err) {
-    console.error('Error removing favorite:', err);
+    console.error('Ошибка:', err);
     error.value = 'Ошибка при удалении товара из избранного';
   } finally {
     removingId.value = null;
@@ -314,7 +305,6 @@ onMounted(() => {
   cursor: not-allowed;
 }
 
-/* Responsive design */
 @media (max-width: 768px) {
   .container {
     padding: 1rem;

@@ -125,7 +125,6 @@ onMounted(() => {
 onUnmounted(() => {
   stopAutoplay();
   
-  // Remove touch event listeners
   const carouselElement = document.querySelector('.carousel-container');
   if (carouselElement) {
     carouselElement.removeEventListener('touchstart', handleTouchStart);
@@ -134,7 +133,6 @@ onUnmounted(() => {
 });
 
 watch(() => props.slides, () => {
-  // Ресет карусели, когда слайды кончаются
   activeIndex.value = 0;
   stopAutoplay();
   startAutoplay();
@@ -173,7 +171,7 @@ watch(() => props.slides, () => {
   width: 20%;
   z-index: 2;
   cursor: pointer;
-  background: rgba(0, 0, 0, 0); /* Прозрачная зона */
+  background: rgba(0, 0, 0, 0); 
 }
 
 .carousel-click-zone.left {
@@ -251,7 +249,6 @@ watch(() => props.slides, () => {
   background: #fff;
 }
 
-/* Responsive adjustments */
 @media (min-width: 768px) {
   .carousel-title {
     font-size: 3rem;

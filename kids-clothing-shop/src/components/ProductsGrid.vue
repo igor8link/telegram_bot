@@ -11,12 +11,28 @@
       <p>Загрузка товаров...</p>
     </div>
     
-    <div v-else-if="products.length > 0" class="product-grid">
-      <ProductCard 
-        v-for="product in products" 
-        :key="product.id" 
-        :product="product" 
-      />
+    <div v-else-if="products.length > 0" class="product-slider-wrapper">
+      <!-- Кнопки-стрелки для ПК -->
+      <button class="slider-button left" @click="scrollLeft" aria-label="Scroll left">
+        ←
+      </button>
+      <button class="slider-button right" @click="scrollRight" aria-label="Scroll right">
+        →
+      </button>
+      
+      <div 
+        ref="slider" 
+        class="product-slider" 
+        @touchstart="onTouchStart" 
+        @touchend="onTouchEnd"
+      >
+        <ProductCard 
+          v-for="product in products" 
+          :key="product.id" 
+          :product="product" 
+          class="slider-item"
+        />
+      </div>
     </div>
     
     <div v-else class="no-products">
@@ -45,20 +61,59 @@ const props = defineProps({
   },
   gender: {
     type: String,
-    default: null, // 'boys', 'girls', or null for all
+    default: null,
     validator: (value) => ['boys', 'girls', null].includes(value)
   }
 });
 
 const loading = ref(true);
 const products = ref([]);
+const slider = ref(null);
+
+let touchStartX = 0;
+let touchEndX = 0;
+
+const onTouchStart = (e) => {
+  touchStartX = e.changedTouches[0].screenX;
+};
+
+const onTouchEnd = (e) => {
+  touchEndX = e.changedTouches[0].screenX;
+  handleSwipe();
+};
+
+// жесты 
+const handleSwipe = () => {
+  const threshold = 50;
+  if (!slider.value) return;
+  if (touchEndX < touchStartX - threshold) {
+    
+    scrollRight();
+  } else if (touchEndX > touchStartX + threshold) {
+    
+    scrollLeft();
+  }
+};
+
+// Прокрутка на ширину одного элемента
+const scrollLeft = () => {
+  if (!slider.value) return;
+  const container = slider.value;
+  const cardWidth = container.querySelector('.slider-item')?.offsetWidth || 0;
+  container.scrollBy({ left: -cardWidth - 16, behavior: 'smooth' });
+};
+
+const scrollRight = () => {
+  if (!slider.value) return;
+  const container = slider.value;
+  const cardWidth = container.querySelector('.slider-item')?.offsetWidth || 0;
+  container.scrollBy({ left: cardWidth + 16, behavior: 'smooth' });
+};
 
 onMounted(async () => {
   try {
     loading.value = true;
     let response;
-    
-    // Fetch products based on gender prop
     if (props.gender === 'boys') {
       response = await api.getBoysProducts({ limit: props.limit });
     } else if (props.gender === 'girls') {
@@ -66,9 +121,7 @@ onMounted(async () => {
     } else {
       response = await api.getProducts({ limit: props.limit });
     }
-    
     products.value = response.data.results || response.data;
-    console.log(`${props.gender || 'All'} products loaded:`, products.value);
   } catch (error) {
     console.error('Failed to load products:', error);
     products.value = [];
@@ -126,27 +179,68 @@ onMounted(async () => {
   color: #666;
 }
 
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1.5rem;
+.product-slider-wrapper {
+  position: relative;
+}
+
+.product-slider {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 10px; 
+}
+
+.product-slider::-webkit-scrollbar {
+  display: none;
+}
+
+
+.slider-item {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  width: 200px; 
+}
+
+.slider-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.slider-button:hover {
+  background: rgba(255, 255, 255, 1);
+}
+
+.slider-button.left {
+  left: -16px;
+}
+
+.slider-button.right {
+  right: -16px;
 }
 
 @media (max-width: 768px) {
-  .product-grid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 1rem;
-  }
-  
-  .section-title {
-    font-size: 1.25rem;
+  .slider-button {
+    display: none;
   }
 }
 
 @media (max-width: 480px) {
-  .product-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
+  .slider-item {
+    width: 160px;
   }
 }
 </style>
