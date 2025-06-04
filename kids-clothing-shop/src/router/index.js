@@ -1,13 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '@/stores/authStore';
-import HomeView from '@/views/HomeView.vue';
 import { useCartStore } from '@/stores/cartStore';
 
 const routes = [
   {
     path: '/',
     name: 'home',
-    component: HomeView,
+    component: () => import('@/views/HomeView.vue'),
     meta: { title: 'Главная' }
   },
   {
@@ -40,18 +39,12 @@ const routes = [
     component: () => import('@/views/CartView.vue'),
     meta: { title: 'Корзина' }
   },
-  // {
-  //   path: '/categories/:gender/:slug',
-  //   name: 'category',
-  //   component: () => import('@/views/CategoryDetailView.vue'),
-  //   meta: { title: 'Категория' }
-  // },
-  // {
-  //   path: '/products/new',
-  //   name: 'new-products',
-  //   component: () => import('@/views/NewProductsView.vue'),
-  //   meta: { title: 'Новинки' }
-  // },
+  {
+    path: '/catalog',
+    name: 'catalog',
+    component: () => import('@/views/CatalogView.vue'),
+    meta: { title: 'Каталог' }
+  },
   {
     path: '/products/:slug',
     name: 'product-detail',
