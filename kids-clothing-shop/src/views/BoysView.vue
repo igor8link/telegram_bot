@@ -31,20 +31,17 @@ const boysCarouselSlides = ref([
     image: new URL('@/assets/images/banner_01.png', import.meta.url).href,
     alt: 'Новая коллекция для мальчиков',
     title: 'НОВАЯ КОЛЛЕКЦИЯ',
-    subtitle: 'Стильная одежда для мальчиков',
   },
   {
     id: 2,
-    image: new URL('@/assets/images/banner_01.png', import.meta.url).href,
+    image: new URL('@/assets/images/banner_for_boys.png', import.meta.url).href,
     alt: 'Спортивная одежда',
     title: 'СПОРТ И АКТИВНОСТЬ',
   },
   {
     id: 3,
-    image: new URL('@/assets/images/banner_01.png', import.meta.url).href,
+    image: new URL('@/assets/images/banner_for_boys2.png', import.meta.url).href,
     alt: 'Школьная форма',
-    title: 'К ШКОЛЕ ГОТОВ',
-    subtitle: 'Школьная и деловая одежда',
   }
 ]);
 </script>

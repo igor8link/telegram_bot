@@ -32,21 +32,17 @@ const girlsCarouselSlides = ref([
     image: new URL('@/assets/images/banner_01.png', import.meta.url).href,
     alt: 'Новая коллекция для девочек',
     title: 'НОВАЯ КОЛЛЕКЦИЯ',
-    subtitle: 'Красивая одежда для девочек',
   },
   {
     id: 2,
     image: new URL('@/assets/images/banner_for_girls1.png', import.meta.url).href,
     alt: 'Праздничные платья',
-    title: 'ПРАЗДНИЧНАЯ КОЛЛЕКЦИЯ',
-    subtitle: 'Нарядные платья и костюмы',
   },
-  {
+  { 
     id: 3,
     image: new URL('@/assets/images/banner_for_girls2.png', import.meta.url).href,
     alt: 'Школьная форма',
-    title: 'ШКОЛЬНАЯ ФОРМА',
-    subtitle: 'Стильная и удобная форма',
+    title: 'ВЕРХНЯЯ ОДЕЖДА',
   }
 ]);
 </script>
