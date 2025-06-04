@@ -90,6 +90,11 @@ const routes = [
     name: 'privacy',
     component: () => import('@/views/PrivacyView.vue'),
   },
+  {
+    path: '/about',
+    name: 'about',
+    component: () => import('@/views/AboutView.vue'),
+  },
   // // Error pages
   // {
   //   path: '/404',
