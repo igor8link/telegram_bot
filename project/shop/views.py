@@ -135,10 +135,9 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     ordering = ['-created_at']
     
     def get_queryset(self):
-        # Optimize queries with prefetch_related
         queryset = Product.objects.filter(is_available=True)
         
-        # Prefetch variants with their images and stocks
+        # Подготовка товара с изображением, цветом и размером
         variants_prefetch = Prefetch(
             'variants',
             queryset=ProductVariant.objects.prefetch_related(
@@ -381,7 +380,7 @@ class CartItemViewSet(viewsets.ModelViewSet):
             response_serializer = self.get_serializer(existing_item)
             return Response(response_serializer.data)
         
-        # Create new item
+        # Создание нового товара в корзине
         serializer.save(cart=cart)
         
         headers = self.get_success_headers(serializer.data)
@@ -410,13 +409,13 @@ class OrderViewSet(viewsets.ModelViewSet):
             cart = Cart.objects.get(user=request.user)
         except Cart.DoesNotExist:
             return Response(
-                {'error': 'No cart found'}, 
+                {'error': 'Корзина не найдена'}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
         
         if not cart.items.exists():
             return Response(
-                {'error': 'Cart is empty'}, 
+                {'error': 'Корзина пуста'}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
         

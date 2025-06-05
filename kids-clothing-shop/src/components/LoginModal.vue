@@ -106,12 +106,12 @@
           </div>
           
           <div class="form-group">
-            <label for="register-first-name">Имя*</label>
+            <label for="register-first-name">ФИО</label>
             <input
               id="register-first-name"
               v-model="registerForm.first_name"
               type="text"
-              placeholder="Ваше имя"
+              placeholder="Иванов Ивано Иванович"
               required
               class="form-input"
             />
@@ -185,9 +185,9 @@
           
           <div class="auth-footer">
             <p class="auth-notice">
-              Нажимая кнопку «Зарегистрироваться» Покупатель подтверждает согласие с 
+              Нажимая кнопку «Зарегистрироваться» Вы подтверждаете согласие с 
               <a href="/privacy" class="auth-link">Политикой конфиденциальности и защиты персональных данных</a>
-              и дает <a href="/consent" class="auth-link">СОГЛАСИЕ</a> на обработку персональных данных
+              и даете <a href="/consent" class="auth-link">СОГЛАСИЕ</a> на обработку персональных данных
             </p>
           </div>
         </form>

@@ -120,14 +120,11 @@ class ProductListSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'slug', 'created_at']
     
     def get_main_image_url(self, obj):
-        # Try to get the default variant first
         default_variant = obj.variants.filter(is_default=True).first()
         
-        # If no default variant, get the first variant
         if not default_variant:
             default_variant = obj.variants.first()
-        
-        # If we have a variant, get its first image
+
         if default_variant:
             first_image = default_variant.images.order_by('sort_order').first()
             if first_image and first_image.image:
@@ -202,8 +199,7 @@ class CartItemSerializer(serializers.ModelSerializer):
         product = obj.product_stock.variant.product
         variant = obj.product_stock.variant
         size = obj.product_stock.size
-        
-        # Get the first image of the variant
+
         first_image = variant.images.order_by('sort_order').first()
         image_url = None
         if first_image and first_image.image:

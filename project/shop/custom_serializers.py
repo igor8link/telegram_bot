@@ -6,7 +6,7 @@ from .models import CustomerProfile
 
 
 class CustomUserCreateSerializer(BaseUserCreateSerializer):
-    """Custom user creation serializer that also creates customer profile"""
+    """Валидатор модели пользователя Django с прокси моделью"""
     phone_number = serializers.CharField(max_length=20, required=False, allow_blank=True, write_only=True)
     address = serializers.CharField(required=False, allow_blank=True, write_only=True)
     
@@ -15,7 +15,7 @@ class CustomUserCreateSerializer(BaseUserCreateSerializer):
         fields = ('id', 'username', 'email', 'first_name', 'password', 'phone_number', 'address')
     
     def validate(self, attrs):
-        # Remove profile fields from user validation
+        # Исключение информации прокси модели из валидатора модели пользователя
         self.profile_data = {
             'phone_number': attrs.pop('phone_number', ''),
             'address': attrs.pop('address', '')
@@ -23,10 +23,10 @@ class CustomUserCreateSerializer(BaseUserCreateSerializer):
         return super().validate(attrs)
     
     def create(self, validated_data):
-        # Create user with only User model fields
+        # Создание пользователя модели Django
         user = super().create(validated_data)
         
-        # Create customer profile with the stored profile data
+        # Создание профиля с моделью пользователя Django и прокси моделью
         CustomerProfile.objects.create(
             user=user,
             phone_number=self.profile_data.get('phone_number', ''),

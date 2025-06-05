@@ -14,10 +14,10 @@ export const useAuthStore = defineStore('auth', () => {
   const login = async (credentials) => {
     loading.value = true;
     try {
-      console.log('Attempting login with:', { username: credentials.username });
+      console.log('Вход:', { username: credentials.username });
       const response = await api.login(credentials);
       
-      console.log('Login response:', response.data);
+      console.log('Ответ входа:', response.data);
       
       // Хранение токенов доступа
       token.value = response.data.access;
@@ -30,7 +30,7 @@ export const useAuthStore = defineStore('auth', () => {
       
       return response.data;
     } catch (error) {
-      console.error('Login error details:', {
+      console.error('Ошибка входа:', {
         status: error.response?.status,
         data: error.response?.data,
         message: error.message
@@ -47,12 +47,12 @@ export const useAuthStore = defineStore('auth', () => {
   const register = async (userData) => {
     loading.value = true;
     try {
-      console.log('Attempting registration with data:', userData);
+      console.log('Попытка регистрации:', userData);
       const response = await api.register(userData);
-      console.log('Registration successful:', response.data);
+      console.log('Успешная регистрация:', response.data);
       return response.data;
     } catch (error) {
-      console.error('Registration error:', error.response?.data);
+      console.error('Ошибка регистрации:', error.response?.data);
       throw error;
     } finally {
       loading.value = false;
@@ -74,14 +74,14 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const response = await api.getUserProfile();
       user.value = response.data;
-      console.log('User profile fetched:', response.data);
+      console.log('Профиль найден:', response.data);
     } catch (error) {
-      console.error('Failed to fetch user profile:', error);
+      console.error('Ошибка загрузки пользователя:', error);
 
       if (error.response?.status === 401) {
         logout();
       } else if (error.response?.status === 404) {
-        console.log('Profile not found, will be created automatically');
+        console.log('Профиль не найден');
       }
     }
   };
@@ -98,7 +98,7 @@ export const useAuthStore = defineStore('auth', () => {
       localStorage.setItem('token', token.value);
       return true;
     } catch (error) {
-      console.error('Failed to refresh token:', error);
+      console.error('Ошибка обновления токена, refresh token:', error);
       logout();
       return false;
     }
@@ -107,7 +107,7 @@ export const useAuthStore = defineStore('auth', () => {
   const updateProfile = async (profileData) => {
     loading.value = true;
     try {
-      console.log('Updating profile with data:', profileData);
+      console.log('Обновление профиля с:', profileData);
       
       // Обновление профиля
       const updatePayload = {
@@ -121,10 +121,10 @@ export const useAuthStore = defineStore('auth', () => {
 
       user.value = { ...user.value, ...response.data };
       
-      console.log('Profile updated successfully:', response.data);
+      console.log('Профиль обновлён:', response.data);
       return response.data;
     } catch (error) {
-      console.error('Profile update error:', error.response?.data);
+      console.error('Ошибка обновления профиля:', error.response?.data);
       throw error;
     } finally {
       loading.value = false;

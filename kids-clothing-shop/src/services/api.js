@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// Create an axios instance with default configurations
+// НАстройка axios
 const apiClient = axios.create({
   baseURL: '/api',
   timeout: 10000,
@@ -18,7 +18,7 @@ apiClient.interceptors.request.use(
       config.headers['Authorization'] = `Bearer ${token}`;
     }
     
-    // Add debug logging
+    // Дебаг
     console.log('API Request:', {
       method: config.method?.toUpperCase(),
       url: config.url,
@@ -29,12 +29,12 @@ apiClient.interceptors.request.use(
     return config;
   },
   error => {
-    console.error('Request interceptor error:', error);
+    console.error('Ошибка перехвата запроса:', error);
     return Promise.reject(error);
   }
 );
 
-// Add response interceptor to handle common errors
+// Обработка ошибок
 apiClient.interceptors.response.use(
   response => {
     console.log('API Response:', {
@@ -69,7 +69,6 @@ apiClient.interceptors.response.use(
 export default {
 
   login(credentials) {
-    console.log('Attempting login with credentials:', credentials);
     return apiClient.post('/token/', credentials);
   },
   
@@ -78,7 +77,6 @@ export default {
   },
   
   register(userData) {
-    console.log('Attempting registration with data:', userData);
     return apiClient.post('/auth/users/', userData);
   },
 

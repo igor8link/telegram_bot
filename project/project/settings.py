@@ -99,7 +99,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Custom authentication backends
+# Бек кастомной аутентификации
 AUTHENTICATION_BACKENDS = [
     'shop.authentication.EmailOrUsernameModelBackend',
     'django.contrib.auth.backends.ModelBackend',

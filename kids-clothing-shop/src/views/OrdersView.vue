@@ -11,7 +11,7 @@
       </div>
       <div v-else-if="orders.length === 0" class="orders-empty">
         <p>У вас пока нет заказов.</p>
-        <router-link to="/" class="back-to-shop">Вернуться в каталог</router-link>
+        <router-link to="/catalog" class="back-to-shop">Вернуться в каталог</router-link>
       </div>
       <div v-else class="orders-list">
         <div v-for="order in orders" :key="order.id" class="order-card">
