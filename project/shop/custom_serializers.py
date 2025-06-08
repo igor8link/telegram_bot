@@ -1,4 +1,3 @@
-# project/shop/custom_serializers.py
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer
@@ -37,7 +36,7 @@ class CustomUserCreateSerializer(BaseUserCreateSerializer):
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
-    """Custom user serializer with profile information"""
+    """Прокси модель для профиля"""
     profile = serializers.SerializerMethodField()
     
     class Meta:

@@ -161,7 +161,6 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
         return ProductDetailSerializer
     
     def get_serializer_context(self):
-        """Add request to serializer context"""
         context = super().get_serializer_context()
         context['request'] = self.request
         return context

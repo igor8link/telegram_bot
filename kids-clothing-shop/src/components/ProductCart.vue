@@ -91,12 +91,12 @@ const isFavorite = computed(() => {
 
 // Проверкаа изминения статуса избранного
 watch(isFavorite, (newVal, oldVal) => {
-  console.log(`Product ${props.product.id} favorite status: ${oldVal} -> ${newVal}`);
+  console.log(`Товар ${props.product.id} в избранное: ${oldVal} -> ${newVal}`);
 }, { immediate: true });
 
 // Проверка списка избранного
 watch(() => favoriteStore.favoriteItems, (newItems) => {
-  console.log('Favorites array updated:', newItems.length, 'items');
+  console.log('Обновление избранного:', newItems.length, 'items');
 }, { deep: true });
 
 const mainImage = computed(() => {

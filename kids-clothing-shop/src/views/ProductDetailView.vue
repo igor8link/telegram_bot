@@ -146,12 +146,12 @@ const addToCart = async () => {
     // сразу редиректим в корзину
     router.push('/cart');
   } catch (e) {
-    console.error('Ошибка при addToCart:', e);
+    console.error('Ошибка при добавлении товара:', e);
     if (e.response) {
       console.error('— status:', e.response.status);
       console.error('— data:', e.response.data);
     }
-    alert('Ошибка при добавлении в корзину. Подробности — в консоли.');
+    alert('Для добавления товаров в корзину, вы должны зарегистрироваться');
   }
 };
 

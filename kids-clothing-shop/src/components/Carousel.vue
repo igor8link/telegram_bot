@@ -22,8 +22,8 @@
       </div>
     </div>
     
-    <div class="carousel-click-zone left" @click="prevSlide" aria-label="Previous slide"></div>
-    <div class="carousel-click-zone right" @click="nextSlide" aria-label="Next slide"></div>
+    <div class="carousel-click-zone left" @click="prevSlide" aria-label="Следующий"></div>
+    <div class="carousel-click-zone right" @click="nextSlide" aria-label="Прошлый"></div>
 
     <div class="carousel-controls" v-if="slides.length > 1">
       <div class="carousel-dots">
@@ -33,7 +33,7 @@
           class="carousel-dot"
           :class="{ active: index === activeIndex }"
           @click="goToSlide(index)"
-          :aria-label="`Go to slide ${index + 1}`"
+          :aria-label="`Перейти на ${index + 1}`"
         ></button>
       </div>
     </div>
@@ -113,8 +113,7 @@ const handleSwipe = () => {
 
 onMounted(() => {
   startAutoplay();
-  
-  // Add touch event listeners
+
   const carouselElement = document.querySelector('.carousel-container');
   if (carouselElement) {
     carouselElement.addEventListener('touchstart', handleTouchStart, { passive: true });

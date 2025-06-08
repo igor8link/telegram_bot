@@ -53,15 +53,19 @@ apiClient.interceptors.response.use(
     });
 
     if (error.response?.status === 401) {
+    const originalRequestUrl = error.config?.url || '';
 
+    const isLoginAttempt = originalRequestUrl.includes('/token/');
+
+    if (!isLoginAttempt) {
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
 
       if (!window.location.pathname.includes('/login') && window.location.pathname !== '/') {
         window.location.href = '/';
       }
-    }
-
+  }
+}
     return Promise.reject(error);
   }
 );

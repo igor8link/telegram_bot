@@ -27,7 +27,6 @@
         </button>
       </div>
 
-      <!-- CategoriesBar (может быть свернут/развернут) -->
       <div class="section-block">
         <CategoriesBar
           v-model="selectedCategoryId"
@@ -35,7 +34,6 @@
         />
       </div>
 
-      <!-- Сетка товаров -->
       <div class="section-block">
         <div v-if="loading" class="loading-container">
           <span>Загрузка товаров...</span>
@@ -84,8 +82,6 @@ const fetchProducts = async () => {
     if (selectedCategoryId.value !== null) {
       params.categories = selectedCategoryId.value;
     }
-
-    // Выбор эндпоинта в зависимости от гендера
     if (selectedGender.value === 'B') {
       response = await api.getBoysProducts(params);
     } else if (selectedGender.value === 'G') {
@@ -108,17 +104,9 @@ const fetchProducts = async () => {
   }
 };
 
-/**
- * Нажатие на «Все» должно:
- * 1) Сбросить гендер (selectedGender = null) – мы уже передали null как аргумент сюда.
- * 2) Сбросить категорию (selectedCategoryId = null) – чтобы «Открыть всё» в CategoriesBar сработало так же.
- * 3) Перезапросить товары.
- */
 const applyGenderFilter = (gender) => {
-  // Если кликнули по той же кнопке — снимаем фильтр
   selectedGender.value = (selectedGender.value === gender ? null : gender);
 
-  // Если выбрали «Все» (т.е. gender = null), тоже сбросим категорию
   if (selectedGender.value === null) {
     selectedCategoryId.value = null;
   }
